@@ -1,0 +1,14 @@
+/* Printable receipt: always black on white, whatever theme the site uses. */
+*{box-sizing:border-box}body{margin:0;background:#eef0f6;color:#111;font:15px/1.5 Inter,system-ui,sans-serif}
+.bar{max-width:760px;margin:16px auto 0;display:flex;gap:10px;padding:0 12px}.bar a,.bar button{padding:8px 16px;border-radius:99px;border:1px solid #bbb;background:#fff;color:#111;font:600 .9rem Inter,sans-serif;cursor:pointer;text-decoration:none}
+.bar button{background:#3b6cff;border-color:#3b6cff;color:#fff}
+.rc{max-width:760px;margin:12px auto 40px;background:#fff;border:1px solid #ccc;padding:28px 34px}
+.hd{display:flex;gap:16px;align-items:center;border-bottom:2px solid #111;padding-bottom:12px}.hd img{width:64px;height:64px;border-radius:50%;object-fit:cover}
+.hd h1{margin:0;font:800 1.5rem Sora,Inter,sans-serif}.hd p{margin:0;color:#444;font-size:.85rem}
+h2{text-align:center;letter-spacing:.2em;font:700 1.05rem Inter,sans-serif;margin:18px 0}
+.meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;margin:10px 0}td,th{border:1px solid #bbb;padding:8px 10px;text-align:left;vertical-align:top}th{width:34%;background:#f4f5f9;font-weight:600}
+.amt{font:800 1.4rem Sora,Inter,sans-serif}.words{font-style:italic}
+.foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:34px;gap:20px}.foot .sig{border-top:1px solid #111;padding-top:4px;min-width:200px;text-align:center;font-size:.85rem}
+.note{color:#555;font-size:.8rem;margin-top:16px}
+@media print{body{background:#fff}.bar{display:none}.rc{border:0;margin:0;max-width:none;padding:0}}

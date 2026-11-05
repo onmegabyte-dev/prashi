@@ -1,0 +1,48 @@
+/* Admin panel – same colours and glass look as the website, laid out as a dashboard. */
+.adm{background:var(--bg);font-size:15px}
+.adm h1{font-size:clamp(1.5rem,3vw,2rem);margin:0 0 14px}.adm h2{font-size:1.05rem}.adm h3{font-size:1rem}
+.top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:10px 18px;background:var(--bg2);border-bottom:1px solid var(--bd)}
+.top .logo{font:800 1.05rem Sora}.top .sp{flex:1}.top .who{color:var(--mu);font-size:.85rem}.top form{margin:0}
+#menu{display:none;background:none;border:0;color:inherit;font-size:1.5rem;cursor:pointer}
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 56px)}
+#side{padding:16px 12px;border-right:1px solid var(--bd);background:var(--bg2);position:sticky;top:56px;align-self:start;height:calc(100vh - 56px);overflow:auto}
+#side h2{font:600 .72rem Inter;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin:16px 8px 6px}
+#side a{display:block;padding:8px 12px;border-radius:10px;color:var(--tx)}#side a:hover{background:var(--card)}#side a.on{background:var(--g);color:#fff}
+#main{padding:24px clamp(14px,3vw,34px) 60px;min-width:0;max-width:1200px}
+.help{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:18px}.help summary{cursor:pointer;font-weight:600}.help div{margin-top:8px;color:var(--mu)}.help ul{margin-left:20px}
+.btn.sm{padding:6px 12px;font-size:.82rem}.btn.dng{background:#d63a55;color:#fff}.btn[disabled]{opacity:.4;cursor:not-allowed}
+.bar-tools{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.tools input,.tools select{width:auto;min-width:150px;padding:8px 12px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:14px;background:var(--card)}
+.tbl{width:100%;border-collapse:collapse}.tbl th,.tbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd);vertical-align:middle}
+.tbl th{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mu);white-space:nowrap}.tbl th a{color:inherit}.tbl tr:last-child td{border-bottom:0}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.acts form,.btnrow form{margin:0;display:inline}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.78rem;font-weight:600}.pill.on{background:rgba(52,211,153,.18);color:#34d399}.pill.off{background:rgba(251,191,36,.16);color:#fbbf24}
+.pill.new{background:rgba(59,108,255,.2);color:#8aa6ff}.pill.contacted{background:rgba(251,191,36,.16);color:#fbbf24}.pill.demo_booked{background:rgba(139,92,246,.2);color:#b79cff}.pill.enrolled{background:rgba(52,211,153,.18);color:#34d399}.pill.closed{background:rgba(160,160,180,.2);color:var(--mu)}
+.form{max-width:760px}.fld{margin-bottom:6px}.fld small{display:block;margin-top:3px}.chkrow{margin:12px 0}
+.tip{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--bd);font-size:.72rem;cursor:help;margin-left:4px}
+.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.curimg{display:flex;gap:14px;align-items:center;margin-bottom:8px}.curimg img{border-radius:10px;height:auto}
+.stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:22px}.stats .card{padding:16px}.stats b{font:800 2rem Sora;display:block}.stats a{display:block}
+.two{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:6px 14px}.kv dt{color:var(--mu)}.kv dd{margin:0;word-break:break-word}
+.pager{display:flex;gap:12px;align-items:center;margin-top:14px}
+.note{border-left:3px solid var(--c);padding:6px 12px;margin:8px 0;background:var(--card);border-radius:0 10px 10px 0}
+.secret{font:700 1.4rem ui-monospace,Menlo,monospace;padding:14px;border:2px dashed var(--c);border-radius:12px;display:inline-block;margin:8px 0;user-select:all}
+.rt{background:var(--card);min-height:200px;border-radius:0 0 12px 12px}.js .rt-src{display:none}
+.ql-toolbar{border-radius:12px 12px 0 0;background:#fff}.ql-container{font:inherit;color:var(--tx);min-height:200px}.ql-editor{min-height:200px}
+.grid2{display:grid;gap:0 18px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.sel-col{width:34px}
+@media(max-width:900px){
+ #menu{display:block}.shell{grid-template-columns:1fr}
+ #side{display:none;position:fixed;inset:56px 0 0 0;z-index:45;height:auto;width:100%}#side.open{display:block}
+ .top .who{display:none}
+ .tbl thead{display:none}.tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}.tbl tr{border-bottom:1px solid var(--bd);padding:8px 4px}
+ .tbl td{border:0;padding:4px 10px}.tbl td[data-label]:before{content:attr(data-label)": ";color:var(--mu);font-size:.78rem}
+ .kv{grid-template-columns:1fr}
+}
+@media print{.top,#side,.btnrow,.no-print{display:none!important}.shell{display:block}}
+
+/* Staff logins: wide table on the left, narrow "add" form on the right (stacks on small screens) */
+.users-two{grid-template-columns:minmax(0,1fr) 340px}.users-two .form{position:sticky;top:16px}.users-two .tbl-wrap{min-width:0}
+@media(max-width:1100px){.users-two{grid-template-columns:1fr}.users-two .form{position:static}}

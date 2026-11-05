@@ -1,0 +1,34 @@
+/* Student portal – simple, thumb-friendly, same look as the website. */
+.pt{background:var(--bg)}
+.pt h1{font-size:clamp(1.4rem,5vw,1.9rem);margin:0 0 6px}.pt h2{font-size:1.1rem;margin:0 0 10px}
+.ptop{position:sticky;top:0;z-index:40;background:var(--bg2);border-bottom:1px solid var(--bd)}
+.ptop .row{display:flex;align-items:center;gap:10px;padding:10px 16px}
+.ptop .logo{font:800 1.05rem Sora}.ptop .sp{flex:1}.ptop form{margin:0}
+#pmenu{display:none;background:none;border:0;color:inherit;font-size:1.5rem;cursor:pointer}
+.pshell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 56px)}
+#pside{padding:16px 12px;border-right:1px solid var(--bd);background:var(--bg2);position:sticky;top:56px;align-self:start;height:calc(100vh - 56px);overflow:auto}
+#pside h2{font:600 .72rem Inter;text-transform:uppercase;letter-spacing:.08em;color:var(--mu);margin:16px 8px 6px}
+#pside a,.sidebtn{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:10px;color:var(--tx);background:none;border:0;font:inherit;cursor:pointer}
+#pside a:hover,.sidebtn:hover{background:var(--card)}#pside a.on{background:var(--g);color:#fff}#pside form{margin:0}
+.pmain{max-width:1000px;width:100%;padding:24px clamp(14px,3vw,32px) 90px;min-width:0}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:16px 0}
+.tile{padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--bd)}.tile b{display:block;font:800 1.7rem Sora}.tile span{color:var(--mu);font-size:.85rem}
+.good{color:#34d399}.warn{color:#fbbf24}.bad2{color:#ff7a8a}
+.list{display:grid;gap:10px}.item{padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--bd)}
+.item h3{margin:0 0 2px}.meta{color:var(--mu);font-size:.85rem}
+.two{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start}
+.tblw{overflow-x:auto;border:1px solid var(--bd);border-radius:14px;background:var(--card)}
+.ptbl{width:100%;border-collapse:collapse}.ptbl th,.ptbl td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--bd)}.ptbl th{font-size:.78rem;text-transform:uppercase;color:var(--mu)}.ptbl tr:last-child td{border:0}
+.chip{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.78rem;font-weight:600;background:rgba(34,211,238,.14);color:var(--c)}
+.chip.present{background:rgba(52,211,153,.18);color:#34d399}.chip.absent{background:rgba(255,122,138,.16);color:#ff7a8a}.chip.late{background:rgba(251,191,36,.16);color:#fbbf24}.chip.excused{background:rgba(160,160,180,.2);color:var(--mu)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:6px 14px}.kv dt{color:var(--mu)}.kv dd{margin:0;word-break:break-word}
+.reply{border-left:3px solid var(--c);padding:6px 12px;margin-top:8px;background:rgba(34,211,238,.06);border-radius:0 10px 10px 0}
+.empty{color:var(--mu);padding:14px 0}
+@media(max-width:600px){.kv{grid-template-columns:1fr}.ptbl th:nth-child(n+4),.ptbl td:nth-child(n+4){display:none}.ptbl.keep th,.ptbl.keep td{display:table-cell!important}}
+@media(max-width:900px){#pmenu{display:block}.pshell{grid-template-columns:1fr}#pside{display:none;position:fixed;inset:56px 0 0 0;z-index:45;height:auto;width:100%}#pside.open{display:block}.ptop .who{display:none}}
+
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--g);color:#fff;display:inline-grid;place-items:center;font:700 .8rem Sora;flex:none}
+.avatar.big{width:48px;height:48px;font-size:1rem}.avatar.huge{width:112px;height:112px;font-size:2rem}
+#pside a.me{display:flex;align-items:center;gap:12px;padding:8px;margin-bottom:6px;border-bottom:1px solid var(--bd);border-radius:12px}#pside a.me b{display:block;font:700 1rem Sora}#pside a.me small{color:var(--mu);font-size:.8rem}
+#pside a.me:hover{background:var(--card)}
+.pic{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
