@@ -1,0 +1,10 @@
+<article class="card tilt rv" data-lv="{{ c.class_level }}" data-ex="{{ c.exam }}" data-ty="{{ c.course_type }}" data-du="{{ c.duration }}" data-sub="{{ c.subjectList|join(',') }}" data-q="{{ (c.name ~ ' ' ~ (c.subjectList|join(' ')))|lower }}">
+{% if c.image %}<img class="cimg" src="/uploads/{{ c.image }}" alt="{{ c.name }}" loading="lazy">{% endif %}
+<span class="tag">{{ c.exam }}</span><span class="tag">{{ c.course_type }}</span>
+<h3>{{ c.name }}</h3>
+<p class="mu">{{ c.class_level }} · {{ c.duration }} · {{ c.subjectList|join(', ') }}</p>
+<ul class="mu" style="margin:10px 0 12px 18px">{% for h in c.highlightList %}<li>{{ h }}</li>{% endfor %}</ul>
+<p class="mu" style="font-size:.88rem">{% if c.faculty_name %}Faculty: {{ c.faculty_name }}<br>{% endif %}{{ c.schedule_text }}</p>
+<p style="margin:10px 0">{% if c.fee_amount %}<b>{{ money(c.fee_amount) }}</b> <span class="mu">/ course</span>{% else %}<span class="mu">Fee: <a style="text-decoration:underline" href="/contact">contact us</a></span>{% endif %}</p>
+<a class="btn o" href="/courses/{{ c.slug }}">View Details</a> <a class="btn" href="/admissions?c={{ c.slug }}">Enroll Now</a>
+</article>

@@ -1,0 +1,4 @@
+{% include 'partials/head.html' %}
+{% with h1='Terms & Conditions', sub='Please read before enrolling.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w prose">{{ richText(s.terms_html) }}</div></section>
+{% include 'partials/foot.html' %}

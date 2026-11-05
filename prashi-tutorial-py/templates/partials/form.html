@@ -1,0 +1,20 @@
+{# Renders a Form Builder form. Needs: key (form name), fields, btn, optional pick (preselected course). #}
+<form data-f="{{ key }}" action="/forms/{{ key }}" method="post" novalidate>
+{% for f in fields %}{% set id = key ~ '_' ~ f.name %}
+  {% if f.type == 'checkbox' %}
+  <label class="chk"><input type="checkbox" id="{{ id }}" name="{{ f.name }}"> <span>{{ f.label }}{{ ' *' if f.required else '' }}</span></label>
+  {% else %}
+  <label for="{{ id }}">{{ f.label }}{{ ' *' if f.required else '' }}</label>
+  {% if f.type == 'textarea' %}<textarea id="{{ id }}" name="{{ f.name }}" rows="4" maxlength="3000" {{ 'required' if f.required else '' }} aria-describedby="{{ id }}_e"></textarea>
+  {% elif f.type == 'select' %}<select id="{{ id }}" name="{{ f.name }}" {{ 'required' if f.required else '' }} aria-describedby="{{ id }}_e"><option value="">Choose…</option>{% for o in f.options %}<option value="{{ o.value }}" {{ 'selected' if (pick is defined and f.name == 'course' and pick == o.value) else '' }}>{{ o.label }}</option>{% endfor %}</select>
+  {% else %}<input id="{{ id }}" name="{{ f.name }}" type="{{ f.type }}" maxlength="300" {{ 'required' if f.required else '' }} aria-describedby="{{ id }}_e" {{ ('inputmode="tel" autocomplete="tel"' if f.type == 'tel' else ('autocomplete="email"' if f.type == 'email' else ''))|safe }}>{% endif %}
+  {% if f.help_text %}<small class="mu">{{ f.help_text }}</small>{% endif %}
+  <div class="err" id="{{ id }}_e" data-for="{{ f.name }}"></div>
+  {% endif %}
+{% endfor %}
+<div class="hp" aria-hidden="true"><label>Leave this empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
+<label class="chk"><input type="checkbox" name="consent" id="{{ key }}_consent"> <span>I agree to the <a style="text-decoration:underline" href="/privacy" target="_blank">Privacy Policy</a> and allow {{ s.site_name }} to contact me. *</span></label>
+<div class="err" data-for="_consent"></div>
+<button class="btn" style="margin-top:16px">{{ btn }}</button>
+<div class="ok" hidden role="status"></div><div class="bad" hidden role="alert"></div>
+</form>

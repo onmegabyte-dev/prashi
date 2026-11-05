@@ -1,0 +1,7 @@
+<article class="card tilt rv">
+{% if f.photo %}<img class="ph-img" src="/uploads/{{ f.photo }}" alt="Photo of {{ f.name }}" loading="lazy">{% else %}<div class="av" aria-hidden="true">{{ initials(f.name) }}</div>{% endif %}
+<h3>{{ f.name }}</h3><p class="tag" style="margin-top:6px">{{ f.subject }}</p>
+<p class="mu">{{ f.qualifications }}{% if f.experience %} · {{ f.experience }}{% endif %}</p>
+{% if f.focus %}<p class="mu"><b>Focus:</b> {{ f.focus }}</p>{% endif %}
+<p class="mu" style="margin-top:8px">{{ f.bio }}</p>
+</article>

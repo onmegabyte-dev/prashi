@@ -1,0 +1,27 @@
+{% set MENU = [
+    ['My portal', [['/portal', 'Dashboard'], ['/portal/materials', 'Study material'], ['/portal/scores', 'Test scores'], ['/portal/attendance', 'Attendance'], ['/portal/fees', 'Fees'], ['/portal/notices', 'Notices'], ['/portal/doubts', 'Ask a doubt'], ['/portal/remarks', 'Teacher’s remarks'], ['/portal/profile', 'My profile']]],
+    ['Our website', [['/', 'Home'], ['/about', 'About'], ['/courses', 'Courses'], ['/faculty', 'Faculty'], ['/results', 'Results'], ['/resources', 'Resources'], ['/admissions', 'Admissions'], ['/contact', 'Contact']]]
+  ] %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>{{ title }} – {{ s.site_name }}</title>
+<meta name="csrf-token" content="{{ csrfToken }}">
+<link rel="icon" href="/img/logo-original.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css"><link rel="stylesheet" href="/css/portal.css">
+<script src="/js/boot.js"></script>
+</head><body class="pt">
+<a class="skip" href="#main">Skip to content</a>
+<header class="ptop"><div class="row"><button id="pmenu" aria-label="Open menu" aria-expanded="false" aria-controls="pside">☰</button>
+<a class="logo" href="/portal"><img src="/img/logo-original.jpg" alt="" width="30" height="30" style="border-radius:50%;vertical-align:middle;margin-right:6px">{{ s.site_name }}</a><span class="sp"></span>
+{% if user.photo %}<img class="avatar" src="/portal/photo?v={{ user.photo }}" alt="Your profile picture" width="34" height="34">{% else %}<span class="avatar init" aria-hidden="true">{{ initials(user.name) }}</span>{% endif %}<span class="mu who" style="font-size:.85rem">{{ user.name }}</span>
+<form method="post" action="/logout"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o" style="padding:6px 14px">Sign out</button></form></div></header>
+<div class="pshell"><aside id="pside" aria-label="Student menu">
+<a class="me" href="/portal/profile" title="Change your profile picture">{% if user.photo %}<img class="avatar big" src="/portal/photo?v={{ user.photo }}" alt="Your profile picture" width="48" height="48">{% else %}<span class="avatar big init" aria-hidden="true">{{ initials(user.name) }}</span>{% endif %}<span><b>My portal</b><small>{{ user.name }}</small></span></a>
+{% for g in MENU %}<h2>{{ g[0] }}</h2>{% for i in g[1] %}<a href="{{ i[0] }}" {{ 'class="on" aria-current="page"' if nav == i[0] else '' }}>{{ i[1] }}</a>{% endfor %}{% endfor %}
+<h2>Account</h2><a href="/account/password">Change my password</a>
+<form method="post" action="/logout"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="sidebtn">Sign out</button></form></aside>
+<main id="main" class="pmain" tabindex="-1">
+{% if flash %}<div class="{{ 'ok' if flash.type == 'ok' else 'bad' }}" role="{{ 'status' if flash.type == 'ok' else 'alert' }}" style="margin-bottom:14px">{{ flash.msg }}</div>{% endif %}
+<h1>{{ title }}</h1>

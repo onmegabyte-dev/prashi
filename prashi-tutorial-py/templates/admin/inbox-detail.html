@@ -1,0 +1,18 @@
+{% include 'admin/_head.html' %}
+<p><a href="/admin/inbox">← Back to inbox</a></p>
+<div class="two">
+<section class="card"><h2>Details</h2><p class="mu">Received {{ showUtc(r.created_at) }} · {{ r.form }} form · <span class="pill {{ r.status }}">{{ r.status.replace('_', ' ') }}</span></p>
+<dl class="kv">{% for a in answers %}<dt>{{ a[0] }}</dt><dd>{{ a[1] }}</dd>{% endfor %}</dl>
+{% if r.form == 'admission' %}<div class="btnrow">{% if existing %}<a class="btn o" href="/admin/students/{{ existing.id }}">Student already exists →</a>{% else %}<a class="btn" href="/admin/students/new?from={{ r.id }}" title="Opens the new-student form with these details filled in">Create student account</a>{% endif %}</div>{% endif %}</section>
+<div>
+<section class="card"><h2>Follow-up</h2>
+<form method="post" action="/admin/inbox/{{ r.id }}/status"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><label for="st">Status <span class="tip" tabindex="0" title="Move it along as you follow up">?</span></label>
+<select id="st" name="status">{% for x in STATUSES %}<option value="{{ x[0] }}" {{ 'selected' if r.status == x[0] else '' }}>{{ x[1] }}</option>{% endfor %}</select><div class="btnrow"><button class="btn sm">Update status</button></div></form>
+<form method="post" action="/admin/inbox/{{ r.id }}/assign"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><label for="as">Assigned to <span class="tip" tabindex="0" title="The counsellor responsible for calling this family">?</span></label>
+<select id="as" name="user"><option value="">— nobody —</option>{% for c in counsellors %}<option value="{{ c.id }}" {{ 'selected' if r.assigned_to == c.id else '' }}>{{ c.name }}</option>{% endfor %}</select><div class="btnrow"><button class="btn sm">Assign</button></div></form></section>
+<section class="card" style="margin-top:18px"><h2>Private notes</h2><p class="mu">Only staff can see these.</p>
+<form method="post" action="/admin/inbox/{{ r.id }}/note"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><label class="sr" for="nt">New note</label><textarea id="nt" name="note" rows="3" placeholder="e.g. Called, parent will visit Saturday" required></textarea><div class="btnrow"><button class="btn sm">Add note</button></div></form>
+{% for n in notes %}<div class="note"><span class="mu">{{ n.author or 'Someone' }} · {{ showUtc(n.created_at) }}</span><br><span style="white-space:pre-wrap">{{ n.note }}</span></div>{% endfor %}</section>
+{% if user.role == 'admin' %}<form method="post" action="/admin/inbox/{{ r.id }}/delete" data-confirm="Delete this enquiry and its notes permanently?" style="margin-top:18px"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm">Delete this enquiry</button></form>{% endif %}
+</div></div>
+{% include 'admin/_foot.html' %}

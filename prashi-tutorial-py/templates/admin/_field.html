@@ -1,0 +1,19 @@
+{# One form field. Needs: f {k,l,t,req,help,options,step,min,max,rows}, val, errs (object). #}
+{% set id = 'f_' ~ f.k %}{% set err = (errs[f.k] if errs else '') or '' %}{% set v = '' if (val is none or val is undefined) else val %}
+<div class="fld{{ ' chkrow' if f.t == 'checkbox' else '' }}">
+{% if f.t == 'checkbox' %}
+  <label class="chk"><input type="checkbox" id="{{ id }}" name="{{ f.k }}" value="1" {{ 'checked' if (v == 1 or v == '1' or v is true) else '' }}> <span>{{ f.l }}</span></label>
+{% else %}
+  <label for="{{ id }}">{{ f.l }}{{ ' *' if f.req else '' }}{% if f.help %} <span class="tip" tabindex="0" role="note" title="{{ f.help }}">?</span>{% endif %}</label>
+  {% if f.t == 'textarea' %}<textarea id="{{ id }}" name="{{ f.k }}" rows="{{ f.rows or 4 }}" {{ 'required' if f.req else '' }}>{{ v }}</textarea>
+  {% elif f.t == 'richtext' %}<div class="rt" data-for="{{ id }}"></div><textarea id="{{ id }}" name="{{ f.k }}" class="rt-src">{{ v }}</textarea>
+  {% elif f.t == 'select' %}<select id="{{ id }}" name="{{ f.k }}" {{ 'required' if f.req else '' }}>{% if not f.req or f.blank %}<option value="">{{ f.blank or '— none —' }}</option>{% endif %}{% for o in f.options %}{% set ov = o.v if o is mapping else o %}{% set ol = o.l if o is mapping else o %}<option value="{{ ov }}"{% if o is mapping and o.schedule is defined %} data-schedule="{{ o.schedule or '' }}"{% endif %} {{ 'selected' if (ov|string) == (v|string) else '' }}>{{ ol }}</option>{% endfor %}</select>
+  {% elif f.t == 'image' or f.t == 'file' %}
+    {% if v and f.t == 'image' %}<div class="curimg"><img src="/uploads/{{ v }}" alt="Current image" width="96"><label class="chk"><input type="checkbox" name="_remove_{{ f.k }}" value="1"> <span>Remove this image</span></label></div>{% elif v and f.t == 'file' %}<p class="mu">Current file attached. Choose a new one to replace it.</p>{% endif %}
+    <input type="file" id="{{ id }}" name="{{ f.k }}" {{ 'accept="image/jpeg,image/png,image/gif,image/webp"'|safe if f.t == 'image' else '' }}>
+  {% elif f.t == 'datetime' %}<input type="datetime-local" id="{{ id }}" name="{{ f.k }}" value="{{ v }}">
+  {% else %}<input id="{{ id }}" name="{{ f.k }}" type="{{ 'number' if f.t == 'number' else (f.t or 'text') }}" value="{{ v }}" {{ 'required' if f.req else '' }} {{ ('step="' ~ f.step ~ '"')|safe if f.step else '' }} {{ ('min="' ~ f.min ~ '"')|safe if (f.min is defined and f.min is not none) else '' }} {{ ('max="' ~ f.max ~ '"')|safe if (f.max is defined and f.max is not none) else '' }} {{ ('' if (f.t == 'number' or f.t == 'date') else 'maxlength="300"')|safe }}>{% endif %}
+  {% if f.help %}<small class="mu">{{ f.help }}</small>{% endif %}
+{% endif %}
+{% if err %}<div class="err" role="alert">{{ err }}</div>{% endif %}
+</div>

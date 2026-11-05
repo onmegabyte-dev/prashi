@@ -1,0 +1,16 @@
+{% include 'admin/_head.html' %}
+{% set bad = (a.rows|length) - a.ok %}
+<p><a href="/admin/students/import">← Choose a different file</a></p>
+<div class="stats"><div class="card"><span class="mu">Rows in the file</span><b>{{ a.rows|length }}</b></div><div class="card"><span class="mu">Ready to import</span><b style="color:#34d399">{{ a.ok }}</b></div><div class="card"><span class="mu">Have problems</span><b style="color:{{ '#ff7a8a' if bad else 'inherit' }}">{{ bad }}</b></div></div>
+{% if a.unknown|length %}<p class="mu">Ignored columns (not recognised): {{ a.unknown|join(', ') }}</p>{% endif %}
+{% if a.ok %}
+<form method="post" action="/admin/students/import/confirm?_csrf={{ csrfToken }}" enctype="multipart/form-data" data-confirm="Create {{ a.ok }} student login{{ '' if a.ok == 1 else 's' }} now?">
+<textarea name="csv" hidden>{{ csv }}</textarea>
+<div class="btnrow"><button class="btn">Import {{ a.ok }} student{{ '' if a.ok == 1 else 's' }}{{ (' (skip the ' ~ bad ~ ' with problems)') if bad else '' }}</button><a class="btn o" href="/admin/students/import">Cancel</a></div></form>
+{% else %}<div class="bad" role="alert">No row can be imported yet. Fix the problems below in your spreadsheet and upload it again.</div>{% endif %}
+<div class="tbl-wrap" style="margin-top:16px"><table class="tbl"><thead><tr><th>Line</th><th>Student</th><th>Class</th><th>Parent</th><th>Batch</th><th>Fee / paid</th><th>Check</th></tr></thead><tbody>
+{% for r in a.rows %}<tr style="{{ 'background:rgba(255,122,138,.08)' if r.errs|length else '' }}"><td data-label="Line">{{ r.line }}</td><td data-label="Student"><b>{{ r.g.name or '—' }}</b></td><td data-label="Class">{{ r.v.class_level or '—' }}</td>
+<td data-label="Parent">{{ r.v.parent_name or '' }}<br><span class="mu">{{ r.v.parent_phone or r.v.parent_email or '' }}</span></td><td data-label="Batch">{{ r.batch.name if r.batch else '—' }}</td>
+<td data-label="Fee / paid">{% if r.batch %}{{ money(r.feeTotal - r.discount) }} / {{ money(r.paidSoFar) }}{% else %}—{% endif %}</td>
+<td data-label="Check">{% if r.errs|length %}<span class="pill off">✘ problem</span><ul style="margin:4px 0 0 18px">{% for e in r.errs %}<li>{{ e }}</li>{% endfor %}</ul>{% else %}<span class="pill on">✔ ready</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>
+{% include 'admin/_foot.html' %}

@@ -1,0 +1,12 @@
+{% include 'admin/_head.html' %}
+<form method="get" class="tools"><select name="status" aria-label="Status"><option value="">All</option>{% for s in ['open','answered','closed'] %}<option value="{{ s }}" {{ 'selected' if status == s else '' }}>{{ s }}</option>{% endfor %}</select></form>
+{% for d in rows %}
+<article class="card" style="margin-top:14px"><p><b>{{ d.student_name }}</b> <span class="mu">({{ d.admission_no }}) · {{ showUtc(d.created_at) }}</span> <span class="pill {{ 'new' if d.status == 'open' else ('enrolled' if d.status == 'answered' else 'closed') }}">{{ d.status }}</span></p>
+{% if d.subject %}<p><b>{{ d.subject }}</b></p>{% endif %}<p style="white-space:pre-wrap">{{ d.message }}</p>
+{% if d.reply %}<div class="note"><b>Reply:</b> <span style="white-space:pre-wrap">{{ d.reply }}</span></div>{% endif %}
+<form method="post" action="/admin/doubts/{{ d.id }}/reply"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><label for="r{{ d.id }}">{{ 'Update reply' if d.reply else 'Your reply' }}</label><textarea id="r{{ d.id }}" name="reply" rows="3" required></textarea>
+<div class="btnrow"><button class="btn sm">Send reply</button></div></form>
+{% if d.status != 'closed' %}<form method="post" action="/admin/doubts/{{ d.id }}/close" data-confirm="Close this doubt?"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm">Close without reply</button></form>{% endif %}</article>
+{% endfor %}
+{% if not rows|length %}<p class="mu">No doubts here. Questions students send from their portal will appear in this list.</p>{% endif %}
+{% include 'admin/_foot.html' %}

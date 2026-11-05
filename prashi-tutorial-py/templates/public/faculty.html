@@ -1,0 +1,5 @@
+{% include 'partials/head.html' %}
+{% with h1='Faculty', sub='Teachers who have sat where your child is sitting.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w"><div class="grid">{% for f in faculty %}{% with f=f %}{% include 'partials/faculty-card.html' %}{% endwith %}{% endfor %}</div></div></section>
+{% include 'partials/cta.html' %}
+{% include 'partials/foot.html' %}

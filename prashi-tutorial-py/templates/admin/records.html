@@ -1,0 +1,30 @@
+{% include 'admin/_head.html' %}
+<div class="bar-tools"><form method="get" class="tools" role="search">
+<input type="search" name="q" value="{{ f.q }}" placeholder="Search title, text, student…" aria-label="Search">
+<select name="type" aria-label="Type"><option value="">All types</option>{% for t in TYPES %}<option value="{{ t[0] }}" {{ 'selected' if f.type == t[0] else '' }}>{{ t[1] }}</option>{% endfor %}</select>
+<select name="vis" aria-label="Visibility"><option value="">Visible + hidden</option><option value="visible" {{ 'selected' if f.vis == 'visible' else '' }}>Visible to student</option><option value="hidden" {{ 'selected' if f.vis == 'hidden' else '' }}>Hidden from student</option></select>
+<select name="batch" aria-label="Batch"><option value="">All students</option>{% for b in batches %}<option value="{{ b.v }}" {{ 'selected' if f.batch == (b.v|string) else '' }}>{{ b.l }}</option>{% endfor %}</select>
+{% if f.batch %}<select name="student" aria-label="Student"><option value="">Whole batch</option>{% for b in students %}<option value="{{ b.v }}" {{ 'selected' if f.student == (b.v|string) else '' }}>{{ b.l }}</option>{% endfor %}</select>{% endif %}
+<button class="btn o sm">Search</button><a class="btn o sm" href="/admin/records">Clear</a></form>
+<a class="btn" href="/admin/records/new">+ Add record</a></div>
+<p class="mu">{{ total }} record{{ '' if total == 1 else 's' }}.</p>
+<form method="post" action="/admin/records/bulk"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th class="sel-col"><input type="checkbox" data-all="ids" aria-label="Select all"></th>
+<th><a href="?{{ qs }}&sort=title&dir=asc">Title</a></th><th><a href="?{{ qs }}&sort=type&dir=asc">Type</a></th><th>For</th><th>Marks</th><th><a href="?{{ qs }}&sort=record_date&dir=desc">Date</a></th><th>Visible to student?</th><th>Actions</th></tr></thead><tbody>
+{% for r in rows %}<tr>
+<td class="sel-col"><input type="checkbox" name="ids" value="{{ r.id }}" aria-label="Select {{ r.title }}"></td>
+<td data-label="Title"><a href="/admin/records/{{ r.id }}/edit"><b>{{ r.title }}</b></a>{% if r.file_path %} <a href="/admin/records/{{ r.id }}/file" title="Download the attached file">📎</a>{% endif %}</td>
+<td data-label="Type">{{ typeLabel[r.type] }}</td><td data-label="For">{{ (r.student_name ~ ' · ' ~ r.batch_name) if (r.student_name and r.batch_name) else (r.student_name if r.student_name else ('Batch: ' ~ r.batch_name)) }}</td><td data-label="Marks">{% if r.score is not none %}{{ r.score }} / {{ r.max_score }}{% else %}—{% endif %}</td>
+<td data-label="Date">{{ fmtDate(r.record_date) if r.record_date else '—' }}</td>
+<td data-label="Visible"><span class="pill {{ 'on' if r.visible_to_student else 'off' }}">{{ 'Visible' if r.visible_to_student else 'Hidden' }}</span></td>
+<td class="acts"><a class="btn o sm" href="/admin/records/{{ r.id }}/edit">Edit</a>
+<button class="btn o sm" formaction="/admin/records/{{ r.id }}/toggle" formnovalidate>{{ 'Hide' if r.visible_to_student else 'Release' }}</button>
+<button class="btn dng sm" formaction="/admin/records/{{ r.id }}/delete" data-confirm="Delete “{{ r.title }}” permanently?">Delete</button></td></tr>{% endfor %}
+{% if not rows %}<tr><td colspan="8" class="mu">No records yet. Click “+ Add record”.</td></tr>{% endif %}</tbody></table></div>
+<div class="btnrow no-print"><button class="btn" name="action" value="release" title="Show the ticked records to their students">Release selected to students</button><button class="btn o" name="action" value="hide" title="Hide the ticked records from students">Hide selected</button></div></form>
+{% include 'admin/_pager.html' %}
+<section class="card" style="margin-top:22px"><h2>Release a whole batch at once</h2><p class="mu">Makes every <b>hidden</b> record for a batch visible: records addressed to the batch, plus personal records of its current students.</p>
+<form method="post" action="/admin/records/release-batch" class="tools" data-confirm="Release all hidden records for this batch to students now?"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label class="sr" for="rb">Batch</label><select id="rb" name="batch_id" required><option value="">Choose batch…</option>{% for b in batches %}<option value="{{ b.v }}">{{ b.l }}</option>{% endfor %}</select>
+<label class="sr" for="rt">Type</label><select id="rt" name="type"><option value="">All types</option>{% for t in TYPES %}<option value="{{ t[0] }}">{{ t[1] }}</option>{% endfor %}</select><button class="btn sm">Release</button></form></section>
+{% include 'admin/_foot.html' %}

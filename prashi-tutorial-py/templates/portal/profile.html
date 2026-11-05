@@ -1,0 +1,19 @@
+{% include 'portal/_head.html' %}
+<section class="item" style="margin-bottom:16px"><h2>Profile picture</h2>
+<div class="pic">
+{% if user.photo %}<img class="avatar huge" src="/portal/photo?v={{ user.photo }}" alt="Your profile picture" width="112" height="112">{% else %}<span class="avatar huge init" aria-hidden="true">{{ initials(user.name) }}</span>{% endif %}
+<div>
+<form method="post" action="/portal/profile/photo?_csrf={{ csrfToken }}" enctype="multipart/form-data">
+<label for="photo">{{ 'Choose a new picture' if user.photo else 'Choose a picture' }}</label>
+<input type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/gif,image/webp" required>
+<small class="mu">JPG, PNG, GIF or WebP, up to 5 MB. A clear, front-facing photo works best. Only you and the institute’s staff can see it.</small>
+<p><button class="btn" style="margin-top:10px">Upload picture</button></p></form>
+{% if user.photo %}<form method="post" action="/portal/profile/photo/remove" data-confirm="Remove your profile picture?"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o" style="padding:6px 14px">Remove picture</button></form>{% endif %}
+</div></div></section>
+<div class="two"><section class="item"><dl class="kv"><dt>Name</dt><dd>{{ s.name }}</dd><dt>Admission no.</dt><dd><b>{{ s.admission_no }}</b></dd><dt>Sign-in name</dt><dd>{{ s.username }}{% if s.email %} or {{ s.email }}{% endif %}</dd>
+<dt>Class</dt><dd>{{ s.class_level or '—' }}</dd><dt>School</dt><dd>{{ s.school or '—' }}</dd><dt>Date of birth</dt><dd>{{ fmtDate(s.dob) if s.dob else '—' }}</dd><dt>Joined</dt><dd>{{ fmtDate(s.joined_on) if s.joined_on else '—' }}</dd></dl></section>
+<section class="item"><h2>Parent / guardian on record</h2><dl class="kv"><dt>Name</dt><dd>{{ s.parent_name or '—' }}</dd><dt>Phone</dt><dd>{{ s.parent_phone or '—' }}</dd><dt>Email</dt><dd>{{ s.parent_email or '—' }}</dd></dl>
+<p class="mu">If any detail is wrong, please tell the office so it can be corrected.</p></section></div>
+<h2 style="margin-top:20px">My batches</h2><div class="list">{% for b in batches %}<div class="item"><h3>{{ b.course_name }} – {{ b.batch_name }}</h3><span class="meta">{{ b.timing }} · {{ b.status }}</span></div>{% endfor %}{% if not batches %}<p class="empty">Not in a batch yet.</p>{% endif %}</div>
+<p style="margin-top:20px"><a class="btn o" href="/account/password">Change my password</a></p>
+{% include 'portal/_foot.html' %}

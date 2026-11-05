@@ -1,0 +1,4 @@
+{% include 'portal/_head.html' %}
+<div class="list">{% for n in notices %}<div class="item"><h3>{{ '📌 ' if n.pinned else '' }}{{ n.title }}</h3><span class="meta">{{ showUtc(n.created_at) }}</span><div class="prose mu">{{ clean(n.body_html) }}</div></div>{% endfor %}
+{% if not notices %}<p class="empty">No notices right now.</p>{% endif %}</div>
+{% include 'portal/_foot.html' %}

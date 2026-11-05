@@ -1,0 +1,20 @@
+{% include 'admin/_head.html' %}
+<div class="bar-tools"><form method="get" class="tools" role="search">
+<input type="search" name="q" value="{{ f.q }}" placeholder="Search name, phone, answers…" aria-label="Search">
+<select name="form" aria-label="Form"><option value="">All forms</option>{% for x in FORMS %}<option value="{{ x[0] }}" {{ 'selected' if f.form == x[0] else '' }}>{{ x[1] }}</option>{% endfor %}</select>
+<select name="status" aria-label="Status"><option value="">Any status</option>{% for x in STATUSES %}<option value="{{ x[0] }}" {{ 'selected' if f.status == x[0] else '' }}>{{ x[1] }}</option>{% endfor %}</select>
+<select name="who" aria-label="Assigned to"><option value="">Anyone</option><option value="me" {{ 'selected' if f.who == 'me' else '' }}>Assigned to me</option><option value="none" {{ 'selected' if f.who == 'none' else '' }}>Unassigned</option>{% for c in counsellors %}<option value="{{ c.id }}" {{ 'selected' if f.who == c.id|string else '' }}>{{ c.name }}</option>{% endfor %}</select>
+{% if f.kind %}<input type="hidden" name="kind" value="{{ f.kind }}">{% endif %}
+<button class="btn o sm">Search</button><a class="btn o sm" href="/admin/inbox">Clear</a></form>
+<a class="btn" href="/admin/inbox/export.csv?{{ qs }}" title="Download what you see as a spreadsheet (CSV)">⬇ Download CSV</a></div>
+<p class="mu">{{ total }} result{{ '' if total == 1 else 's' }}.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr>
+<th><a href="?{{ qs }}&sort=created_at&dir={{ 'asc' if sort == 'created_at' and dir == 'desc' else 'desc' }}">Received{{ (' ▲' if dir == 'asc' else ' ▼') if sort == 'created_at' else '' }}</a></th>
+<th><a href="?{{ qs }}&sort=form&dir=asc">Form</a></th><th>Name</th><th>Phone</th><th>Interested in</th><th><a href="?{{ qs }}&sort=status&dir=asc">Status</a></th><th>Assigned to</th></tr></thead><tbody>
+{% for r in rows %}<tr>
+<td data-label="Received">{{ showUtc(r.created_at) }}</td><td data-label="Form">{{ r.form }}</td>
+<td data-label="Name"><a href="/admin/inbox/{{ r.id }}"><b>{{ r.who }}</b></a></td><td data-label="Phone">{{ r.phone }}</td><td data-label="Interested in">{{ r.course }}</td>
+<td data-label="Status"><span class="pill {{ r.status }}">{{ r.status.replace('_', ' ') }}</span></td><td data-label="Assigned to">{{ r.assignee or '—' }}</td></tr>{% endfor %}
+{% if not rows|length %}<tr><td colspan="7" class="mu">Nothing here. New enquiries from the website will show up in this list.</td></tr>{% endif %}</tbody></table></div>
+{% include 'admin/_pager.html' %}
+{% include 'admin/_foot.html' %}

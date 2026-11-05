@@ -1,0 +1,15 @@
+{% include 'partials/head.html' %}
+{% with h1=c.name, sub=[c.class_level, c.duration, c.course_type]|select|join(' · ') %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w"><div class="grid" style="grid-template-columns:2fr 1fr;align-items:start" id="cd"><div>
+{% if c.image %}<img class="cimg" src="/uploads/{{ c.image }}" alt="{{ c.name }}">{% endif %}
+<h2 style="font-size:1.5rem">Overview</h2>
+{% if c.description_html %}<div class="prose mu" style="margin:8px 0 22px">{{ clean(c.description_html) }}</div>{% else %}<p class="mu" style="margin:8px 0 22px">{{ c.highlightList|join('. ') }}.{% if c.faculty_name %} Led by {{ c.faculty_name }}, with weekly tests, study material and daily doubt support.{% endif %}</p>{% endif %}
+<h2 style="font-size:1.5rem;margin:26px 0 10px">Includes</h2><p class="mu">{% for x in c.subjectList %}<span class="tag">{{ x }}</span>{% endfor %}<br>Study material · Weekly mock tests · Doubt clinic · Performance dashboard</p>
+<h2 style="font-size:1.5rem;margin:26px 0 10px">Schedule</h2><p class="mu">{{ c.schedule_text }}</p>
+{% if batches|length %}<h2 style="font-size:1.5rem;margin:26px 0 10px">Upcoming batches</h2><div class="grid">{% for b in batches %}<div class="card"><h3>{{ b.name }}</h3><p class="mu">Starts {{ fmtDate(b.start_date) }}<br>{{ b.timing }}</p><p class="badge-{{ b.status }}">{{ 'Seats open' if b.status == 'open' else 'Batch full' }}</p></div>{% endfor %}</div>{% endif %}
+{% if faqs|length %}<h2 style="font-size:1.5rem;margin:26px 0 10px">FAQs</h2>{% include 'partials/faq.html' %}{% endif %}</div>
+<aside class="card" style="position:sticky;top:90px">
+{% if c.fee_amount %}<p class="mu">Course fee</p><b style="font:800 2rem Sora">{{ money(c.fee_amount) }}</b><p class="mu" style="margin:10px 0 18px">{{ ('Up to ' ~ c.instalments ~ ' instalments') if c.instalments > 1 else 'One payment' }}</p>
+{% else %}<p class="mu">Fee and instalment plans</p><b style="font:800 1.3rem Sora">Contact us</b><p class="mu" style="margin:10px 0 18px">Our counsellor will share the fee plan that suits you.</p>{% endif %}
+<a class="btn" href="/admissions?c={{ c.slug }}">Enroll Now</a></aside></div></div></section>
+{% include 'partials/foot.html' %}

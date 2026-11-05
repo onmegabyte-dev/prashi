@@ -1,0 +1,1 @@
+{% if pages > 1 %}<nav class="pager" aria-label="Pages">{% if page > 1 %}<a class="btn o sm" href="?{{ qsp }}&page={{ page - 1 }}">← Previous</a>{% endif %} <span class="mu">Page {{ page }} of {{ pages }}</span> {% if page < pages %}<a class="btn o sm" href="?{{ qsp }}&page={{ page + 1 }}">Next →</a>{% endif %}</nav>{% endif %}

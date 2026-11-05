@@ -1,0 +1,8 @@
+{% include 'partials/head.html' %}
+{% with h1='Results & achievements', sub='Numbers we are proud of, and the students behind them.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w">{% include 'partials/stats.html' %}
+{% if years|length %}<h2 style="margin:50px 0 22px">Year-wise success rate</h2>{% for y in years %}<div style="margin-bottom:12px"><b>{{ y.year }}</b> <span class="mu">{{ y.value }}%</span><div class="bar" role="img" aria-label="{{ y.year }}: {{ y.value }} percent"><i data-w="{{ y.value }}"></i></div></div>{% endfor %}{% endif %}
+{% if ranks|length %}<h2 style="margin:50px 0 22px">Rank holders</h2><div class="grid">{% for r in ranks %}<div class="card tilt rv">{% if r.photo %}<img class="ph-img" src="/uploads/{{ r.photo }}" alt="Photo of {{ r.student_name }}" loading="lazy">{% else %}<div class="av" aria-hidden="true">{{ initials(r.student_name) }}</div>{% endif %}<h3>{{ r.student_name }}</h3><p class="mu">{{ r.exam }}</p><b class="gt" style="font:800 1.5rem Sora">{{ r.rank_or_score }}</b></div>{% endfor %}</div>{% endif %}
+{% if improvement|length %}<h2 style="margin:50px 0 22px">Score improvement</h2><div class="card">{% for y in improvement %}<div style="margin-bottom:12px"><b>{{ y.label }}</b> <span class="mu">average {{ y.value }}%</span><div class="bar" role="img" aria-label="{{ y.label }}: {{ y.value }} percent"><i data-w="{{ y.value }}"></i></div></div>{% endfor %}</div>{% endif %}
+{% if testimonials|length %}<h2 style="margin:50px 0 22px">Student stories</h2>{% include 'partials/testimonials.html' %}{% endif %}</div></section>
+{% include 'partials/foot.html' %}

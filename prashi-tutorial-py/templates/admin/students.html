@@ -1,0 +1,20 @@
+{% include 'admin/_head.html' %}
+<div class="bar-tools"><form method="get" class="tools" role="search">
+<input type="search" name="q" value="{{ q }}" placeholder="Search name, admission no., parent…" aria-label="Search">
+<select name="cls" aria-label="Class"><option value="">All classes</option>{% for c in CLASSES %}<option {{ 'selected' if cls == c else '' }}>{{ c }}</option>{% endfor %}</select>
+<select name="batch" aria-label="Batch"><option value="">All batches</option>{% for b in batches %}<option value="{{ b.id }}" {{ 'selected' if batch == b.id|string else '' }}>{{ b.label }}</option>{% endfor %}</select>
+<select name="st" aria-label="Show"><option value="">All students</option><option value="active" {{ 'selected' if st == 'active' else '' }}>Login on</option><option value="off" {{ 'selected' if st == 'off' else '' }}>Login switched off</option><option value="due" {{ 'selected' if st == 'due' else '' }}>Fees due</option></select>
+<button class="btn o sm">Search</button><a class="btn o sm" href="/admin/students">Clear</a></form>
+<span class="acts"><a class="btn o" href="/admin/students/import" title="Add many students at once from a spreadsheet">⬆ Import from spreadsheet</a><a class="btn" href="/admin/students/new">+ Add student</a></span></div>
+<p class="mu">{{ total }} student{{ '' if total == 1 else 's' }}.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr>
+<th><a href="?{{ qs }}&sort=name&dir={{ 'desc' if sort == 'name' and dir == 'asc' else 'asc' }}">Name{{ (' ▲' if dir == 'asc' else ' ▼') if sort == 'name' else '' }}</a></th>
+<th><a href="?{{ qs }}&sort=adm&dir=asc">Adm. no.</a></th><th>Class</th><th>Batches</th><th>Parent</th><th>Fees</th><th><a href="?{{ qs }}&sort=balance&dir=desc">Balance</a></th><th>Login</th></tr></thead><tbody>
+{% for r in rows %}<tr>
+<td data-label="Name"><a href="/admin/students/{{ r.id }}"><b>{{ r.name }}</b></a></td><td data-label="Adm. no.">{{ r.admission_no }}</td><td data-label="Class">{{ r.class_level or '—' }}</td>
+<td data-label="Batches">{{ r.batches or '—' }}</td><td data-label="Parent">{{ r.parent_name or '' }}<br><span class="mu">{{ r.parent_phone or '' }}</span></td>
+<td data-label="Fees">{{ money(r.fee) }}</td><td data-label="Balance"><b style="color:{{ '#fbbf24' if r.balance > 0 else '#34d399' }}">{{ money(r.balance) }}</b></td>
+<td data-label="Login"><span class="pill {{ 'on' if r.active else 'off' }}">{{ 'On' if r.active else 'Off' }}</span></td></tr>{% endfor %}
+{% if not rows|length %}<tr><td colspan="8" class="mu">No students yet. Click “+ Add student”.</td></tr>{% endif %}</tbody></table></div>
+{% include 'admin/_pager.html' %}
+{% include 'admin/_foot.html' %}

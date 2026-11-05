@@ -1,0 +1,14 @@
+{% include 'admin/_head.html' %}
+{% set typeopts = [] %}{% for t in TYPES %}{% set _ = typeopts.append({'v': t[0], 'l': t[1]}) %}{% endfor %}
+<p><a href="/admin/forms?form={{ fl.form }}">← Back to {{ FORMS[fl.form] }}</a></p>
+{% if errs|length %}<div class="bad" role="alert"><ul style="margin-left:20px">{% for e in errs %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" action="/admin/forms/field/{{ fl.id }}" class="card form" novalidate><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% with f={'k': 'label', 'l': 'Question', 't': 'text', 'req': 1}, val=fl.label, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% if not fl.locked %}
+{% with f={'k': 'type', 'l': 'Answer type', 't': 'select', 'req': 1, 'options': typeopts}, val=fl.type, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'options', 'l': 'Choices (drop-down only)', 't': 'textarea', 'rows': 5, 'help': 'One choice per line. For the “course” field, leave empty to list your visible courses automatically.'}, val=fl.options, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'required', 'l': 'Required', 't': 'checkbox'}, val=fl.required, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% else %}<p class="mu">This is a core field: its type is fixed and it is always required.</p>{% endif %}
+{% with f={'k': 'help_text', 'l': 'Small hint under the question (optional)', 't': 'text'}, val=fl.help_text, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+<div class="btnrow"><button class="btn">Save</button><a class="btn o" href="/admin/forms?form={{ fl.form }}">Cancel</a></div></form>
+{% include 'admin/_foot.html' %}

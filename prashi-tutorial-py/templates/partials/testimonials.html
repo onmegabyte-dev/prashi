@@ -1,0 +1,8 @@
+{% if testimonials|length %}
+<div class="car" id="car"><div class="trk" id="trk">{% for t in testimonials %}<div><div class="card">
+{% if t.photo %}<img class="ph-img" src="/uploads/{{ t.photo }}" alt="Photo of {{ t.student_name }}" loading="lazy">{% else %}<div class="av" aria-hidden="true">{{ initials(t.student_name) }}</div>{% endif %}
+<p style="font-size:1.15rem">“{{ t.quote }}”</p>
+<p style="margin-top:12px"><b>{{ t.student_name }}</b> <span class="mu">· {{ t.exam }} · {{ t.result_text }}</span></p>
+{% if t.rating %}<p style="color:var(--c)" aria-label="{{ t.rating }} out of 5 stars">{{ '★' * t.rating ~ '☆' * (5 - t.rating) }}</p>{% endif %}</div></div>{% endfor %}</div>
+<div style="margin-top:12px;display:flex;gap:10px"><button class="btn o" id="pv" aria-label="Previous story">←</button><button class="btn o" id="nx" aria-label="Next story">→</button></div></div>
+{% endif %}

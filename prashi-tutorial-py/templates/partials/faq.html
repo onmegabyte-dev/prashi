@@ -1,0 +1,1 @@
+<div>{% for q in faqs %}<div class="fq"><button aria-expanded="false">{{ q.question }} <span aria-hidden="true">+</span></button><div>{{ clean(q.answer_html) }}</div></div>{% endfor %}</div>

@@ -1,0 +1,12 @@
+{% include 'partials/head.html' %}
+{% with h1='Courses', sub='Search or filter to find the right batch.' %}{% include 'partials/ph.html' %}{% endwith %}
+{% set subs = [] %}{% for c in courses %}{% for x in c.subjectList %}{% if x not in subs %}{% set _ = subs.append(x) %}{% endif %}{% endfor %}{% endfor %}
+<section><div class="w"><div class="chips" id="filters"><input id="q" type="search" placeholder="Search courses" aria-label="Search courses">
+<select id="fl" aria-label="Level"><option value="">All levels</option>{% for x in courses|map(attribute='class_level')|select|unique %}<option>{{ x }}</option>{% endfor %}</select>
+<select id="fs" aria-label="Subject"><option value="">All subjects</option>{% for x in subs %}<option>{{ x }}</option>{% endfor %}</select>
+<select id="fe" aria-label="Exam"><option value="">All exams</option>{% for x in courses|map(attribute='exam')|select|unique %}<option>{{ x }}</option>{% endfor %}</select>
+<select id="ft" aria-label="Course type"><option value="">Any type</option>{% for x in courses|map(attribute='course_type')|select|unique %}<option>{{ x }}</option>{% endfor %}</select>
+<select id="fd" aria-label="Duration"><option value="">Any duration</option>{% for x in courses|map(attribute='duration')|select|unique %}<option>{{ x }}</option>{% endfor %}</select></div>
+<div class="grid" id="cl">{% for c in courses %}{% with c=c %}{% include 'partials/course-card.html' %}{% endwith %}{% endfor %}</div>
+<p class="mu" id="none" hidden>No courses match. Clear a filter to see more.</p></div></section>
+{% include 'partials/foot.html' %}

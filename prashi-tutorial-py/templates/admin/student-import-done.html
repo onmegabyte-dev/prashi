@@ -1,0 +1,11 @@
+{% include 'admin/_head.html' %}
+<div class="ok" role="status"><b>{{ created|length }} student{{ '' if created|length == 1 else 's' }} imported.</b>{% if skipped|length %} {{ skipped|length }} row(s) were skipped.{% endif %}</div>
+{% if created|length %}
+<div class="card" style="margin-top:14px"><p><b>Save these logins now.</b> The temporary passwords are shown only on this page and are not stored anywhere in readable form. Each student must choose their own password at first sign-in.</p>
+<div class="btnrow no-print"><button class="btn" type="button" data-print>🖨 Print this list</button><button class="btn o" type="button" data-download-table="creds" data-filename="student-logins.csv">⬇ Download as CSV</button><a class="btn o" href="/admin/students">Go to students</a></div></div>
+<div class="tbl-wrap" style="margin-top:14px"><table class="tbl" id="creds"><thead><tr><th>Student</th><th>Login name</th><th>Temporary password</th><th>Batch</th></tr></thead><tbody>
+{% for c in created %}<tr><td data-label="Student"><a href="/admin/students/{{ c.id }}">{{ c.name }}</a></td><td data-label="Login name"><b>{{ c.username }}</b></td><td data-label="Temporary password"><span style="font:700 1rem ui-monospace,Menlo,monospace">{{ c.temp }}</span></td><td data-label="Batch">{{ c.batch or '—' }}</td></tr>{% endfor %}</tbody></table></div>
+{% endif %}
+{% if skipped|length %}<h2 style="margin-top:24px">Skipped rows</h2><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Line</th><th>Student</th><th>Why</th></tr></thead><tbody>
+{% for r in skipped %}<tr><td>{{ r.line }}</td><td>{{ r.g.name }}</td><td>{{ r.errs|join(' ') }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% include 'admin/_foot.html' %}

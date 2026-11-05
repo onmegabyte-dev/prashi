@@ -1,0 +1,11 @@
+{% include 'portal/_head.html' %}
+<div class="two"><section class="item"><h2>Ask a new question</h2>
+{% if error %}<div class="bad" role="alert">{{ error }}</div>{% endif %}
+<form method="post" action="/portal/doubts" novalidate><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label for="subject">Subject (optional)</label><input id="subject" name="subject" maxlength="150" value="{{ vals.subject or '' }}" placeholder="e.g. Physics – Chapter 3">
+<label for="message">Your question *</label><textarea id="message" name="message" rows="5" maxlength="3000" required>{{ vals.message or '' }}</textarea>
+<button class="btn" style="margin-top:14px">Send question</button></form></section>
+<section><h2>My questions</h2><div class="list">{% for d in rows %}<div class="item"><h3>{{ d.subject or 'Question' }} <span class="chip {{ 'present' if d.status == 'answered' else '' }}">{{ 'waiting for reply' if d.status == 'open' else d.status }}</span></h3><span class="meta">{{ showUtc(d.created_at) }}</span>
+<p style="white-space:pre-wrap">{{ d.message }}</p>{% if d.reply %}<div class="reply"><b>Teacher’s reply:</b> <span style="white-space:pre-wrap">{{ d.reply }}</span></div>{% endif %}</div>{% endfor %}
+{% if not rows %}<p class="empty">You have not asked anything yet.</p>{% endif %}</div></section></div>
+{% include 'portal/_foot.html' %}

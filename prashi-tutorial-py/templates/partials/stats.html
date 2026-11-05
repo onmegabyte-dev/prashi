@@ -1,0 +1,2 @@
+{% set T = [[s.stats_students or '10000', '+', 'Students taught'], [s.stats_success or '95', '%', 'Success rate'], [s.stats_faculty or '50', '+', 'Expert faculty'], [s.stats_years or '15', '+', 'Years of experience']] %}
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">{% for x in T %}<div class="card stat rv"><b><span data-n="{{ x[0] }}">{{ locale(x[0]|int) }}</span>{{ '%' if x[2] == 'Success rate' else '+' }}</b><span class="mu">{{ x[2] }}</span></div>{% endfor %}</div>

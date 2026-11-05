@@ -1,0 +1,19 @@
+{% include 'admin/_head.html' %}
+<form method="get" class="tools" style="margin-bottom:14px">
+<input type="search" name="q" value="{{ f.q }}" placeholder="Search what happened…" aria-label="Search">
+<select name="user" aria-label="Person"><option value="">Anyone</option>{% for u in users %}<option {{ 'selected' if f.user == u.v else '' }}>{{ u.v }}</option>{% endfor %}</select>
+<select name="entity" aria-label="Area"><option value="">Any area</option>{% for u in entities %}<option {{ 'selected' if f.entity == u.v else '' }}>{{ u.v }}</option>{% endfor %}</select>
+<select name="action" aria-label="Kind of change"><option value="">Any change</option>{% for u in actions %}<option {{ 'selected' if f.action == u.v else '' }}>{{ u.v }}</option>{% endfor %}</select>
+<label class="sr" for="from">From</label><input id="from" type="date" name="from" value="{{ f['from'] }}" title="From date"><label class="sr" for="to">To</label><input id="to" type="date" name="to" value="{{ f.to }}" title="To date">
+<button class="btn o sm">Filter</button><a class="btn o sm" href="/admin/activity">Clear</a></form>
+<p class="mu">{{ total }} entr{{ 'y' if total == 1 else 'ies' }}.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>Who</th><th>Change</th><th>What happened</th></tr></thead><tbody>
+{% for r in rows %}<tr><td data-label="When">{{ showUtc(r.created_at) }}</td><td data-label="Who">{{ r.user_name or 'System' }}</td><td data-label="Change"><span class="tag">{{ r.action }}</span> <span class="mu">{{ r.entity }}</span></td><td data-label="What happened">{{ r.summary }}</td></tr>{% endfor %}
+{% if not rows|length %}<tr><td colspan="4" class="mu">No activity matches.</td></tr>{% endif %}</tbody></table></div>
+{% with qs=qsp %}{% include 'admin/_pager.html' %}{% endwith %}
+<section class="card" style="margin-top:22px"><h2>Clear the activity log</h2>
+<p class="mu">Removes old entries to keep the log short. This cannot be undone – download the log first (<a href="/admin/data-export">Download data</a>) if you may need it. The clearing itself is recorded.</p>
+<form method="post" action="/admin/activity/clear" class="tools" data-confirm="Clear these activity log entries permanently? This cannot be undone."><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label class="sr" for="ol">Which entries</label><select id="ol" name="older_than" required><option value="">Choose…</option><option value="365">Older than 1 year</option><option value="90">Older than 90 days</option><option value="30">Older than 30 days</option><option value="all">Everything</option></select>
+<button class="btn dng sm">Clear</button></form></section>
+{% include 'admin/_foot.html' %}

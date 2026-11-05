@@ -1,0 +1,8 @@
+{% include 'partials/head.html' %}
+{% with h1='Contact', sub='Visit, call or message us.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w"><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))"><div><div class="card"><h3>{{ s.site_name }}</h3><p class="mu">{{ s.address }}<br>{{ s.phone }}<br>{{ s.email }}<br>{{ s.office_hours }}</p>
+{% if holidays|length %}<p class="mu" style="margin-top:10px"><b>Upcoming closures:</b><br>{% for h in holidays %}{{ h.label }} ({{ fmtDate(h.start_date) }}{{ (' – ' ~ fmtDate(h.end_date)) if h.end_date != h.start_date else '' }})<br>{% endfor %}</p>{% endif %}
+{% if waLink %}<p style="margin-top:14px"><a class="btn" href="{{ waLink }}" target="_blank" rel="noopener">Chat on WhatsApp</a></p>{% endif %}</div>
+{% if map %}<iframe class="map" style="margin-top:18px" src="{{ map }}" title="Map showing {{ s.site_name }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>{% endif %}</div>
+<div class="card"><h3>Send a message</h3>{% with key='contact', fields=contact, btn='Send message' %}{% include 'partials/form.html' %}{% endwith %}</div></div></div></section>
+{% include 'partials/foot.html' %}

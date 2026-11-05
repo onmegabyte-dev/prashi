@@ -1,0 +1,21 @@
+{% include 'admin/_head.html' %}
+<p><a href="/admin/qbank">← Question bank</a></p>
+{% macro choice(field, label, options, hint) %}
+{% set cur = vals[field] or '' %}{% set is_custom = cur == CUSTOM or (cur and cur not in options) %}
+<div class="fld"><label for="f_{{ field }}">{{ label }} *{% if hint %} <span class="tip" tabindex="0" role="note" title="{{ hint }}">?</span>{% endif %}</label>
+<select id="f_{{ field }}" name="{{ field }}" required data-custom-select="{{ field }}"><option value="">— choose —</option>{% for o in options %}<option value="{{ o }}" {{ 'selected' if cur == o else '' }}>{{ o }}</option>{% endfor %}<option value="{{ CUSTOM }}" {{ 'selected' if is_custom else '' }}>Custom…</option></select>
+<input type="text" name="{{ field }}_custom" maxlength="40" value="{{ vals[field ~ '_custom'] or (cur if (cur and cur not in options and cur != CUSTOM) else '') }}" placeholder="Type the {{ label|lower }}" data-custom-for="{{ field }}" style="margin-top:8px" {{ '' if is_custom else 'hidden' }}>
+{% if errs[field] %}<div class="err" role="alert">{{ errs[field] }}</div>{% endif %}</div>
+{% endmacro %}
+<form method="post" action="/admin/qbank/upload?_csrf={{ csrfToken }}" enctype="multipart/form-data" class="card form" novalidate>
+{% if errs and errs|length %}<div class="bad" role="alert">Please fix the highlighted problems.</div>{% endif %}
+<div class="fld"><label for="f_batch_id">Batch *</label><select id="f_batch_id" name="batch_id" required><option value="">— choose a batch —</option>{% for b in batches %}<option value="{{ b.v }}" {{ 'selected' if (vals.batch_id|string) == (b.v|string) else '' }}>{{ b.l }}</option>{% endfor %}</select>{% if errs.batch_id %}<div class="err" role="alert">{{ errs.batch_id }}</div>{% endif %}</div>
+{{ choice('class_level', 'Class', CLASSES, 'Class 6 to 12, or choose Custom for anything else.') }}
+{{ choice('subject', 'Subject', SUBJECTS, 'Physics, Chemistry or Mathematics, or choose Custom.') }}
+<div class="fld"><label for="f_chapter">Chapter *</label><input id="f_chapter" name="chapter" type="text" maxlength="120" list="chapters" value="{{ vals.chapter or '' }}" placeholder="Example: Laws of Motion" required>
+<datalist id="chapters">{% for c in chapters %}<option value="{{ c.v }}">{% endfor %}</datalist>{% if errs.chapter %}<div class="err" role="alert">{{ errs.chapter }}</div>{% endif %}</div>
+{{ choice('q_type', 'Question type', QTYPES, 'How many marks each question in this file carries, or choose Custom (for example MCQ).') }}
+<div class="fld"><label for="f_file">Question file *</label><input id="f_file" name="file" type="file" accept=".pdf,.docx,.txt" required><small class="mu">PDF, Word (.docx) or text (.txt), up to 20 MB. Number the questions 1. 2. 3. … (or Q1. Q2.), or put each on its own line.</small>
+{% if errs.file %}<div class="err" role="alert">{{ errs.file }}</div>{% endif %}</div>
+<div class="btnrow"><button class="btn">Read the questions</button><a class="btn o" href="/admin/qbank">Cancel</a></div></form>
+{% include 'admin/_foot.html' %}

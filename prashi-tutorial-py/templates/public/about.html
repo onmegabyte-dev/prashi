@@ -1,0 +1,8 @@
+{% include 'partials/head.html' %}
+{% with h1='About ' ~ s.site_name, sub=s.about_intro %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w"><div class="grid"><div class="card rv"><h3>Mission</h3><p class="mu">{{ s.about_mission }}</p></div><div class="card rv"><h3>Vision</h3><p class="mu">{{ s.about_vision }}</p></div><div class="card rv"><h3>Values</h3><p class="mu">{{ s.about_values }}</p></div></div>
+{% set journey = parseItems(s.about_journey) %}{% if journey|length %}<h2 style="margin:50px 0 22px">Our journey</h2><div class="tl">{% for x in journey %}<div class="rv"><h3>{{ x.t }}</h3><p class="mu">{{ x.d }}</p></div>{% endfor %}</div>{% endif %}
+{% if s.about_campus %}<h2 style="margin:50px 0 22px">Campus</h2><p class="mu" style="max-width:62ch">{{ s.about_campus }}</p>{% endif %}
+<div style="margin-top:40px">{% include 'partials/stats.html' %}</div></div></section>
+{% include 'partials/cta.html' %}
+{% include 'partials/foot.html' %}

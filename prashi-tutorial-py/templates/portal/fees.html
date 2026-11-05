@@ -1,0 +1,9 @@
+{% include 'portal/_head.html' %}
+<div class="tiles"><div class="tile"><span>Total payable</span><b>{{ money(totals.payable) }}</b></div><div class="tile"><span>Paid</span><b class="good">{{ money(totals.paid) }}</b></div><div class="tile"><span>Balance</span><b class="{{ 'warn' if totals.balance > 0 else 'good' }}">{{ money(totals.balance) }}</b></div></div>
+<div class="list">{% for e in fees %}<div class="item" style="{{ 'opacity:.6' if e.status == 'dropped' else '' }}"><h3>{{ e.course_name }} – {{ e.batch_name }}</h3>
+<span class="meta">Fee {{ money(e.fee_total) }}{{ (' − discount ' ~ money(e.discount)) if e.discount else '' }} = <b>{{ money(e.payable) }}</b> · Paid {{ money(e.paid) }} · <b class="{{ 'warn' if e.balance > 0 else 'good' }}">Balance {{ money(e.balance) }}</b></span></div>{% endfor %}
+{% if not fees %}<p class="empty">No fee records yet.</p>{% endif %}</div>
+{% if payments|length %}<h2 style="margin-top:22px">Payments received</h2><div class="tblw"><table class="ptbl keep"><thead><tr><th>Date</th><th>Amount</th><th>Receipt</th><th>Mode</th></tr></thead><tbody>
+{% for p in payments %}<tr><td>{{ fmtDate(p.paid_on) }}</td><td>{{ money(p.amount) }}</td><td><a href="/portal/receipts/{{ p.id }}" target="_blank" rel="noopener">{{ p.receipt_no }} 🖨</a></td><td>{{ p.mode }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}
+<p class="mu" style="margin-top:14px">Questions about fees? Please ask at the office.</p>
+{% include 'portal/_foot.html' %}

@@ -1,0 +1,14 @@
+{% include 'partials/head.html' %}
+<section style="padding-top:50px"><div class="w" style="max-width:460px"><div class="card">
+<h1 style="font-size:1.8rem">Choose a new password</h1>
+{% if not valid %}<div class="bad" role="alert">This reset link is not valid any more. Links work once and expire after 1 hour.</div><p style="margin-top:12px"><a class="btn" href="/forgot">Get a new link</a></p>
+{% else %}
+{% if error %}<div class="bad" role="alert">{{ error }}</div>{% endif %}
+<form method="post"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label for="password">New password</label><input id="password" name="password" type="password" autocomplete="new-password" minlength="10" required autofocus>
+<small class="mu">At least 10 characters. A few random words is a good idea.</small>
+<label for="confirm">Repeat new password</label><input id="confirm" name="confirm" type="password" autocomplete="new-password" required>
+<button class="btn" style="margin-top:18px;width:100%">Save password</button></form>
+{% endif %}
+</div></div></section>
+{% include 'partials/foot.html' %}

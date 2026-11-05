@@ -1,0 +1,7 @@
+{% include 'portal/_head.html' %}
+{% if not rows %}<p class="empty">No test results have been released to you yet.</p>{% endif %}
+<div class="list">{% for r in rows %}<div class="item"><h3>{{ r.title }}</h3><span class="meta">{{ fmtDate(r.record_date) if r.record_date else '' }}</span>
+<p><b style="font:800 1.4rem Sora">{{ r.score }} / {{ r.max_score }}</b> {% if r.pct is not none %}<span class="chip">{{ r.pct }}%</span>{% endif %}</p>
+{% if r.pct is not none %}<div class="bar" role="img" aria-label="{{ r.pct }} percent"><i style="width:{{ r.pct }}%"></i></div>{% endif %}
+{% if r.body %}<p class="mu" style="white-space:pre-wrap">{{ r.body }}</p>{% endif %}</div>{% endfor %}</div>
+{% include 'portal/_foot.html' %}

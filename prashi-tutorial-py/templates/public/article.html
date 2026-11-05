@@ -1,0 +1,4 @@
+{% include 'partials/head.html' %}
+{% with h1=a.title, sub=a.summary or '' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w">{% if a.cover_image %}<img class="cimg" style="max-width:760px" src="/uploads/{{ a.cover_image }}" alt="">{% endif %}<div class="prose">{{ clean(a.body_html) }}</div><p style="margin-top:26px"><a class="btn o" href="/resources">← All resources</a></p></div></section>
+{% include 'partials/foot.html' %}

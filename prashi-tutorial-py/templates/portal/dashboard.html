@@ -1,0 +1,21 @@
+{% include 'portal/_head.html' %}
+<p class="mu">Welcome back, {{ user.name.split(' ')[0] }}. Here is how things stand.</p>
+<div class="tiles">
+  <a class="tile" href="/portal/fees"><span>Fee balance</span><b class="{{ 'warn' if totals.balance > 0 else 'good' }}">{{ money(totals.balance) }}</b><span>Paid {{ money(totals.paid) }} of {{ money(totals.payable) }}</span></a>
+  <a class="tile" href="/portal/attendance"><span>Attendance (90 days)</span><b class="{{ '' if att.pct is none else ('good' if att.pct >= 75 else 'warn') }}">{% if att.pct is none %}—{% else %}{{ att.pct }}%{% endif %}</b><span>{{ att.total }} days marked</span></a>
+  <a class="tile" href="/portal/scores"><span>Latest score</span><b>{% if scores and scores[0].pct is not none %}{{ scores[0].pct }}%{% else %}—{% endif %}</b><span>{{ scores[0].title if scores else 'No results released yet' }}</span></a>
+  <a class="tile" href="/portal/doubts"><span>My doubts</span><b>{{ openDoubts + answered }}</b><span>{{ answered }} answered · {{ openDoubts }} waiting</span></a>
+</div>
+<div class="two">
+<section><h2>My batches</h2><div class="list">
+{% for b in batches %}<div class="item"><h3>{{ b.course_name }}</h3><span class="meta">{{ b.batch_name }}{{ (' · ' ~ b.timing) if b.timing else '' }}{{ (' · started ' ~ fmtDate(b.start_date)) if b.start_date else '' }}</span></div>{% endfor %}
+{% if not batches %}<p class="empty">You are not in a batch yet. Ask the office.</p>{% endif %}</div>
+{% if remark %}<h2 style="margin-top:20px">Latest remark from your teacher</h2><div class="item"><h3>{{ remark.title }}</h3><p style="white-space:pre-wrap">{{ remark.body }}</p></div>{% endif %}</section>
+<section><h2>Notices</h2><div class="list">
+{% for n in notices %}<div class="item"><h3>{{ n.title }}</h3><div class="prose mu">{{ clean(n.body_html) }}</div></div>{% endfor %}
+{% if not notices %}<p class="empty">No notices right now.</p>{% else %}<a class="btn o" href="/portal/notices">All notices</a>{% endif %}</div></section>
+</div>
+<section style="margin-top:20px"><h2>Latest study material</h2><div class="list">
+{% for m in materials %}<div class="item"><h3>{{ m.title }}</h3><span class="meta">{{ TYPE[m.type] }}{{ (' · ' ~ fmtDate(m.record_date)) if m.record_date else '' }}</span>{% if m.file_path %}<p><a class="btn" style="margin-top:8px" href="/portal/files/{{ m.id }}">⬇ Download</a></p>{% endif %}</div>{% endfor %}
+{% if not materials %}<p class="empty">Nothing has been shared with you yet.</p>{% else %}<a class="btn o" href="/portal/materials">See all</a>{% endif %}</div></section>
+{% include 'portal/_foot.html' %}

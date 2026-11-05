@@ -1,0 +1,10 @@
+{% include 'partials/head.html' %}
+<section style="padding-top:50px"><div class="w" style="max-width:640px"><div class="card status {{ tone }}" role="{{ 'status' if tone == 'ok' else 'alert' }}">
+<span class="code" aria-hidden="true">{{ '✓' if tone == 'ok' else code }}</span>
+<h1 style="font-size:clamp(1.6rem,4vw,2.2rem);margin:6px 0 10px">{{ title }}</h1>
+<p style="font-size:1.1rem">{{ message }}</p>
+{% if tips %}<h2 style="font-size:1rem;margin:20px 0 6px">What you can do</h2><ul class="tips">{% for t in tips %}<li>{{ t }}</li>{% endfor %}</ul>{% endif %}
+<div class="btnrow" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px">{% for a in actions %}<a class="btn{{ '' if loop.first else ' o' }}" href="{{ a[1] }}">{{ a[0] }}</a>{% endfor %}</div>
+<p class="mu" style="margin-top:18px;font-size:.85rem">Need help? {% if s.phone %}Call us on {{ s.phone }}{% endif %}{% if s.phone and s.email %} or {% endif %}{% if s.email %}email {{ s.email }}{% endif %}. (Code {{ code }})</p>
+</div></div></section>
+{% include 'partials/foot.html' %}

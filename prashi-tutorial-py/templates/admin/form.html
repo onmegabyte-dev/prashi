@@ -1,0 +1,19 @@
+{% include 'admin/_head.html' %}
+{# Generic add/edit. Needs: cfg, fields, vals, errs, row (or null), base #}
+<p><a href="{{ base }}">← All {{ cfg.title|lower }}</a></p>
+{% if errs and errs['_'] %}<div class="bad" role="alert">{{ errs['_'] }}</div>{% endif %}
+<form method="post" action="{{ action }}?_csrf={{ csrfToken }}" enctype="multipart/form-data" class="card form" novalidate>
+{% for f in fields %}{% with f=f, val=vals[f.k], errs=errs %}{% include 'admin/_field.html' %}{% endwith %}{% endfor %}
+<div class="btnrow">
+{% if row %}
+  <button class="btn">Save changes</button>
+  {% if cfg.preview %}<a class="btn o" href="/admin/preview/{{ cfg.key }}/{{ row.id }}" target="_blank" rel="noopener">Preview on website</a>{% endif %}
+{% elif cfg.pub %}
+  <button class="btn o" name="publish" value="0" title="Saves it hidden so you can preview first">Save as draft</button>
+  <button class="btn" name="publish" value="1" title="Saves and shows it on the website straight away">Save &amp; publish</button>
+{% else %}<button class="btn">Save</button>{% endif %}
+<a class="btn o" href="{{ base }}">Cancel</a>
+</div>
+{% if row and cfg.pub %}<p class="mu">Status: <b>{{ cfg.pub.on if row[cfg.pub.col] else cfg.pub.off }}</b>. Use the button on the list page to {{ 'hide' if row[cfg.pub.col] else 'publish' }} it.</p>{% endif %}
+</form>
+{% with editor=cfg.editor %}{% include 'admin/_foot.html' %}{% endwith %}

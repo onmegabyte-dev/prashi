@@ -1,0 +1,13 @@
+</main>
+<footer><div class="w"><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:30px">
+<div><a class="logo" href="/" style="display:flex"><img src="/img/logo-original.jpg" alt="" width="34" height="34">{{ s.site_name }}</a><p class="mu" style="margin-top:12px">{{ s.footer_blurb }}</p></div>
+<div><h3>Quick links</h3><a href="/about">About</a><a href="/faculty">Faculty</a><a href="/results">Results</a><a href="/admissions">Admissions</a></div>
+<div><h3>Courses</h3><a href="/courses">All courses</a><a href="/resources">Free resources</a><a href="/admissions">Book free counselling</a></div>
+<div><h3>Contact</h3><p class="mu">{{ s.address }}<br>{{ s.phone }}<br>{{ s.email }}</p>
+{% if s.social_instagram %}<a href="{{ s.social_instagram }}" rel="noopener" target="_blank">Instagram</a>{% endif %}
+{% if s.social_youtube %}<a href="{{ s.social_youtube }}" rel="noopener" target="_blank">YouTube</a>{% endif %}
+{% if s.social_facebook %}<a href="{{ s.social_facebook }}" rel="noopener" target="_blank">Facebook</a>{% endif %}</div></div>
+<p class="mu" style="margin-top:34px;font-size:.85rem">© {{ currentYear }} {{ s.site_name }}{% if s.footer_note %} · {{ s.footer_note }}{% endif %} · <a style="display:inline" href="/privacy">Privacy Policy</a> · <a style="display:inline" href="/terms">Terms &amp; Conditions</a></p></div></footer>
+{% if waLink %}<a class="wa" href="{{ waLink }}" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 5h24v17H13l-7 6v-6H4z"/></svg></a>{% endif %}
+<script src="/js/site.js" defer></script>
+</body></html>

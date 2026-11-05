@@ -1,0 +1,4 @@
+{% include 'portal/_head.html' %}
+<div class="list">{% for r in rows %}<div class="item"><h3>{{ r.title }}</h3><span class="meta">{{ fmtDate(r.record_date) if r.record_date else '' }}</span><p style="white-space:pre-wrap">{{ r.body }}</p></div>{% endfor %}
+{% if not rows %}<p class="empty">No remarks yet.</p>{% endif %}</div>
+{% include 'portal/_foot.html' %}

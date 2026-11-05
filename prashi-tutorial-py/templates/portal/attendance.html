@@ -1,0 +1,6 @@
+{% include 'portal/_head.html' %}
+<div class="tiles"><div class="tile"><span>Present or late</span><b class="{{ '' if att.pct is none else ('good' if att.pct >= 75 else 'warn') }}">{% if att.pct is none %}—{% else %}{{ att.pct }}%{% endif %}</b><span>last 120 days</span></div><div class="tile"><span>Days marked</span><b>{{ att.total }}</b></div><div class="tile"><span>Days present / late</span><b>{{ att.present }}</b></div></div>
+{% if att.rows|length %}<div class="tblw"><table class="ptbl keep"><thead><tr><th>Date</th><th>Batch</th><th>Status</th><th>Remark</th></tr></thead><tbody>
+{% for a in att.rows %}<tr><td>{{ fmtDate(a.day) }}</td><td>{{ a.batch_name }}</td><td><span class="chip {{ a.status }}">{{ a.status }}</span></td><td>{{ a.remark or '' }}</td></tr>{% endfor %}</tbody></table></div>
+{% else %}<p class="empty">No attendance has been recorded for you yet.</p>{% endif %}
+{% include 'portal/_foot.html' %}

@@ -1,0 +1,17 @@
+{% include 'admin/_head.html' %}
+<form method="get" class="tools" style="margin-bottom:16px">
+<label class="sr" for="ab">Batch</label><select id="ab" name="batch" required><option value="">Choose a batch…</option>{% for b in batches %}<option value="{{ b.id }}" {{ 'selected' if batchId == b.id else '' }}>{{ b.label }}</option>{% endfor %}</select>
+<label class="sr" for="ad">Date</label><input id="ad" type="date" name="day" value="{{ day }}"><button class="btn o sm">Show</button></form>
+{% if batchId %}
+{% if not roster|length %}<p class="mu">No active students are enrolled in this batch yet. Enrol students from their student page.</p>{% else %}
+<form method="post" action="/admin/attendance"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="batch" value="{{ batchId }}"><input type="hidden" name="day" value="{{ day }}">
+<p class="mu">{{ roster|length }} students · {{ fmtDate(day) }}</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Student</th><th>Status</th><th>Remark</th><th>Last 30 days</th></tr></thead><tbody>
+{% for s in roster %}<tr><td data-label="Student"><b>{{ s.name }}</b><br><span class="mu">{{ s.admission_no }}</span></td>
+<td data-label="Status"><fieldset style="border:0;padding:0;display:flex;gap:12px;flex-wrap:wrap"><legend class="sr">Status for {{ s.name }}</legend>{% for st in STATUS %}<label class="chk" style="margin:0"><input type="radio" name="s_{{ s.id }}" value="{{ st[0] }}" {{ 'checked' if (s.status or 'present') == st[0] else '' }}> <span>{{ st[1] }}</span></label>{% endfor %}</fieldset></td>
+<td data-label="Remark"><input name="r_{{ s.id }}" value="{{ s.remark or '' }}" maxlength="200" aria-label="Remark for {{ s.name }}" placeholder="optional"></td>
+<td data-label="Last 30 days">{{ (((s.here / s.marked * 100) + 0.5)|int|string + '%') if s.marked else '—' }}</td></tr>{% endfor %}</tbody></table></div>
+<div class="btnrow"><button class="btn">Save attendance</button></div></form>
+{% endif %}
+{% else %}<p class="mu">Choose a batch and a date to begin.</p>{% endif %}
+{% include 'admin/_foot.html' %}

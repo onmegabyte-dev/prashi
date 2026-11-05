@@ -1,0 +1,52 @@
+{% include 'admin/_head.html' %}
+<p><a href="/admin/students">← All students</a></p>
+<div class="two">
+<section class="card">{% if s.photo %}<img src="/admin/students/{{ s.id }}/photo" alt="Photo of {{ s.name }}" width="96" height="96" style="border-radius:50%;object-fit:cover;float:right;margin:0 0 8px 12px">{% endif %}<h2>{{ s.name }} <span class="pill {{ 'on' if s.active else 'off' }}">{{ 'Login on' if s.active else 'Login off' }}</span></h2>
+<dl class="kv"><dt>Admission no.</dt><dd><b>{{ s.admission_no }}</b></dd><dt>Sign-in name</dt><dd>{{ s.username }}{% if s.email %} or {{ s.email }}{% endif %}</dd><dt>Last sign-in</dt><dd>{{ showUtc(s.last_login_at) if s.last_login_at else 'never' }}</dd>
+<dt>Class</dt><dd>{{ s.class_level or '—' }}</dd><dt>School</dt><dd>{{ s.school or '—' }}</dd><dt>Date of birth</dt><dd>{{ fmtDate(s.dob) if s.dob else '—' }}</dd><dt>Joined</dt><dd>{{ fmtDate(s.joined_on) if s.joined_on else '—' }}</dd>
+<dt>Parent</dt><dd>{{ s.parent_name or '—' }}</dd><dt>Parent phone</dt><dd>{{ s.parent_phone or '—' }}</dd><dt>Parent email</dt><dd>{{ s.parent_email or '—' }}</dd><dt>Address</dt><dd>{{ s.address or '—' }}</dd>
+{% if s.notes_internal %}<dt>Private notes</dt><dd style="white-space:pre-wrap">{{ s.notes_internal }}</dd>{% endif %}</dl>
+<div class="btnrow"><a class="btn" href="/admin/students/{{ s.id }}/edit">Edit details</a>
+<form method="post" action="/admin/students/{{ s.id }}/reset-password" data-confirm="Make a new temporary password for {{ s.name }}? The old password stops working."><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o">Reset password</button></form>
+<form method="post" action="/admin/students/{{ s.id }}/toggle" data-confirm="{{ 'Switch off this login? They are signed out immediately; nothing is deleted.' if s.active else 'Switch this login back on?' }}"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o">{{ 'Switch off login' if s.active else 'Switch on login' }}</button></form>
+{% if user.role == 'admin' %}<form method="post" action="/admin/students/{{ s.id }}/delete" data-confirm="Permanently delete {{ s.name }} with all fees, attendance and records? This cannot be undone. (To just block access, use “Switch off login”.)"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng">Delete student</button></form>{% endif %}</div></section>
+<div>
+<section class="card"><h2>Attendance (last 90 days)</h2>
+{% if attPct is none %}<p class="mu">No attendance recorded yet. Mark it under <a style="text-decoration:underline" href="/admin/attendance">Attendance</a>.</p>{% else %}
+<p><b style="font:800 1.8rem Sora">{{ attPct }}%</b> <span class="mu">present or late · {{ attTotal }} days marked</span></p>
+<p class="mu">{% for a in att %}{{ a.status }}: {{ a.n }} &nbsp; {% endfor %}</p>{% endif %}</section>
+<section class="card" style="margin-top:18px"><h2>Tutorial records</h2>
+{% for r in records %}<p><a href="/admin/records/{{ r.id }}/edit"><b>{{ r.title }}</b></a> <span class="mu">{{ r.type.replace('_', ' ') }}</span> <span class="pill {{ 'on' if r.visible_to_student else 'off' }}">{{ 'Visible' if r.visible_to_student else 'Hidden' }}</span></p>{% endfor %}
+{% if not records %}<p class="mu">None yet.</p>{% endif %}
+<div class="btnrow"><a class="btn o sm" href="/admin/records?student={{ s.id }}">All records</a><a class="btn sm" href="/admin/records/new">+ Add record</a></div></section></div></div>
+
+<section class="card" style="margin-top:18px"><h2>Batches &amp; fees</h2>
+<p><b>Total fees:</b> {{ money(totals.payable) }} · <b>Paid:</b> {{ money(totals.paid) }} · <b style="color:{{ '#fbbf24' if totals.balance > 0 else '#34d399' }}">Balance: {{ money(totals.balance) }}</b></p>
+{% for e in fees %}
+<div class="card" style="margin-top:12px;{{ 'opacity:.6' if e.status == 'dropped' else '' }}">
+<p><b>{{ e.course_name }}</b> – {{ e.batch_name }} <span class="pill {{ 'on' if e.status == 'active' else 'off' }}">{{ e.status }}</span></p>
+<p>Payable <b>{{ money(e.payable) }}</b> (fee {{ money(e.fee_total) }} − discount {{ money(e.discount) }}) · Paid <b>{{ money(e.paid) }}</b> · Balance <b style="color:{{ '#fbbf24' if e.balance > 0 else '#34d399' }}">{{ money(e.balance) }}</b></p>
+{% if e.payments|length %}<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Date</th><th>Amount</th><th>Mode</th><th>Receipt</th><th>Recorded by</th><th></th></tr></thead><tbody>
+{% for p in e.payments %}<tr><td data-label="Date">{{ fmtDate(p.paid_on) }}</td><td data-label="Amount">{{ money(p.amount) }}</td><td data-label="Mode">{{ p.mode }}</td><td data-label="Receipt"><a href="/admin/students/{{ s.id }}/receipt/{{ p.id }}" target="_blank" rel="noopener" title="Open a printable receipt">{{ p.receipt_no }} 🖨</a></td><td data-label="By">{{ p.by_name or '' }}</td>
+<td><form method="post" action="/admin/students/{{ s.id }}/payments/{{ p.id }}/delete" data-confirm="Delete this payment of {{ money(p.amount) }}? The balance will go up."><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm">Delete</button></form></td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% if e.balance > 0 and e.status != 'dropped' %}
+<form method="post" action="/admin/students/{{ s.id }}/enrollment/{{ e.id }}/payments" class="tools" style="margin-top:10px"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label class="sr" for="a{{ e.id }}">Amount</label><input id="a{{ e.id }}" name="amount" type="number" min="1" max="{{ e.balance }}" placeholder="Amount ₹" required title="Amount received, in whole rupees">
+<label class="sr" for="d{{ e.id }}">Date</label><input id="d{{ e.id }}" name="paid_on" type="date" value="{{ today }}" required>
+<label class="sr" for="m{{ e.id }}">Mode</label><select id="m{{ e.id }}" name="mode">{% for m in MODES %}<option>{{ m }}</option>{% endfor %}</select>
+<label class="sr" for="r{{ e.id }}">Receipt</label><input id="r{{ e.id }}" name="receipt_no" placeholder="Receipt no. (optional)" title="Leave blank and we will number it for you">
+<button class="btn sm">Record payment</button></form>{% endif %}
+<details style="margin-top:10px"><summary class="mu" style="cursor:pointer">Change fee, discount or status</summary>
+<form method="post" action="/admin/students/{{ s.id }}/enrollment/{{ e.id }}" class="tools" style="margin-top:8px"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label class="sr" for="f{{ e.id }}">Fee</label><input id="f{{ e.id }}" name="fee_total" type="number" min="0" value="{{ e.fee_total }}" title="Total fee ₹"><label class="sr" for="x{{ e.id }}">Discount</label><input id="x{{ e.id }}" name="discount" type="number" min="0" value="{{ e.discount }}" title="Discount ₹">
+<label class="sr" for="s{{ e.id }}">Status</label><select id="s{{ e.id }}" name="status">{% for x in ['active','completed','dropped'] %}<option {{ 'selected' if e.status == x else '' }}>{{ x }}</option>{% endfor %}</select><button class="btn o sm">Save</button></form>
+<form method="post" action="/admin/students/{{ s.id }}/enrollment/{{ e.id }}/delete" data-confirm="Remove from this batch and delete its payment records? This cannot be undone. (Use status “dropped” to keep the history.)"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm" style="margin-top:8px">Remove from batch</button></form></details>
+</div>{% endfor %}
+{% if not fees %}<p class="mu">Not in any batch yet.</p>{% endif %}
+{% if open|length %}<h3 style="margin-top:20px">Assign to a batch</h3>
+<form method="post" action="/admin/students/{{ s.id }}/enroll" class="tools"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label class="sr" for="eb">Batch</label><select id="eb" name="batch_id" required><option value="">Choose batch…</option>{% for b in open %}<option value="{{ b.v }}">{{ b.l }}{{ (' – fee ' ~ money(b.fee_amount)) if b.fee_amount else '' }}</option>{% endfor %}</select>
+<label class="sr" for="ef">Fee</label><input id="ef" name="fee_total" type="number" min="0" placeholder="Fee ₹ (blank = course fee)" title="Leave blank to use the course fee">
+<label class="sr" for="ed">Discount</label><input id="ed" name="discount" type="number" min="0" placeholder="Discount ₹" title="Optional discount in rupees"><button class="btn sm">Enrol</button></form>{% endif %}
+</section>
+{% include 'admin/_foot.html' %}

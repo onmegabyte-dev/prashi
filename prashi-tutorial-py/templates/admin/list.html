@@ -1,0 +1,41 @@
+{% include 'admin/_head.html' %}
+{# Generic list. Needs: cfg, rows, total, page, pages, q, sort, dir, filters(list with current value), qs(base query string) #}
+{% set anyf = (filters|selectattr('value')|list|length) > 0 %}
+<div class="bar-tools">
+<form method="get" class="tools" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search {{ cfg.title|lower }}…" aria-label="Search">
+  {% for fl in filters %}<select name="f_{{ fl.k }}" aria-label="Filter by {{ fl.l }}" title="Filter by {{ fl.l }}"><option value="">{{ fl.l }}: all</option>{% for o in fl.options %}<option value="{{ o.v }}" {{ 'selected' if (o.v|string) == (fl.value|string) else '' }}>{{ o.l }}</option>{% endfor %}</select>{% endfor %}
+  <button class="btn o sm">Search</button>{% if q or anyf %}<a class="btn o sm" href="?">Clear</a>{% endif %}
+</form>
+<a class="btn" href="{{ base }}/new" title="Add a new {{ cfg.single }}">+ Add {{ cfg.single }}</a>
+</div>
+<p class="mu">{{ total }} {{ cfg.single if total == 1 else cfg.title|lower }}{{ ' match your search' if (q or anyf) else '' }}. {{ 'Use ▲ ▼ to change the order shown on the website.' if cfg.reorder else '' }}</p>
+<div class="tbl-wrap"><table class="tbl">
+<thead><tr>
+{% for c in cfg.list %}{% set d = 'desc' if (sort == c.k and dir == 'asc') else 'asc' %}
+<th scope="col"><a href="?{{ qs }}&sort={{ c.k }}&dir={{ d }}" title="Sort by {{ c.l }}">{{ c.l }}{{ (' ▲' if dir == 'asc' else ' ▼') if sort == c.k else '' }}</a></th>
+{% endfor %}
+{% if cfg.pub %}<th scope="col">Status</th>{% endif %}<th scope="col">Actions</th></tr></thead>
+<tbody>
+{% for r in rows %}
+<tr>
+{% for c in cfg.list %}{% set v = r[c.k] %}
+<td data-label="{{ c.l }}">{% if c.fmt == 'bool' %}{{ 'Yes' if v else 'No' }}{% elif c.fmt == 'money' %}{{ money(v) if v else '—' }}{% elif c.fmt == 'date' %}{{ fmtDate(v) if v else '—' }}{% elif c.fmt == 'datetime' %}{{ ((v|string)[:16]|replace('T', ' ')) if v else '—' }}{% elif c.fmt == 'img' %}{% if v %}<img src="/uploads/{{ v }}" alt="" width="40" height="40" style="border-radius:50%;object-fit:cover">{% else %}—{% endif %}{% else %}{% set sv = '—' if (v is none or v == '') else ((v|int|string) if (v is float and v == v|int) else (v|string)) %}{% if loop.first %}<a href="{{ base }}/{{ r.id }}/edit"><b>{{ (sv[:70] ~ '…') if (sv|length > 70) else sv }}</b></a>{% else %}{{ (sv[:70] ~ '…') if (sv|length > 70) else sv }}{% endif %}{% endif %}</td>
+{% endfor %}
+{% if cfg.pub %}{% set on = r[cfg.pub.col] %}<td data-label="Status"><span class="pill {{ 'on' if on else 'off' }}">{{ cfg.pub.on if on else cfg.pub.off }}</span></td>{% endif %}
+<td class="acts" data-label="Actions">
+  <a class="btn o sm" href="{{ base }}/{{ r.id }}/edit">Edit</a>
+  {% if cfg.preview %}<a class="btn o sm" href="/admin/preview/{{ cfg.key }}/{{ r.id }}" target="_blank" rel="noopener" title="See how this will look on the website (works even while hidden)">Preview</a>{% endif %}
+  {% if cfg.pub %}{% set on = r[cfg.pub.col] %}<form method="post" action="{{ base }}/{{ r.id }}/toggle"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm" title="{{ 'Remove from the website (you can bring it back later)' if on else 'Make this visible on the website' }}">{{ cfg.pub.unpublish if on else cfg.pub.publish }}</button></form>{% endif %}
+  {% if cfg.reorder and not sort %}
+  <form method="post" action="{{ base }}/{{ r.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="dir" value="up"><button class="btn o sm" aria-label="Move up" title="Move up" {{ 'disabled' if (page == 1 and loop.first) else '' }}>▲</button></form>
+  <form method="post" action="{{ base }}/{{ r.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="dir" value="down"><button class="btn o sm" aria-label="Move down" title="Move down" {{ 'disabled' if (page == pages and loop.last) else '' }}>▼</button></form>
+  {% endif %}
+  <form method="post" action="{{ base }}/{{ r.id }}/delete" data-confirm="Delete this {{ cfg.single }} permanently? This cannot be undone."><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm">Delete</button></form>
+</td></tr>
+{% endfor %}
+{% if not rows %}<tr><td colspan="{{ (cfg.list|length) + 2 }}" class="mu">Nothing here yet. Click “+ Add {{ cfg.single }}” to create the first one.</td></tr>{% endif %}
+</tbody></table></div>
+{% if cfg.reorder and sort %}<p class="mu">Tip: clear sorting (click “Clear”) to use the ▲ ▼ order buttons.</p>{% endif %}
+{% include 'admin/_pager.html' %}
+{% include 'admin/_foot.html' %}

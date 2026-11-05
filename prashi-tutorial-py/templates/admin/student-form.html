@@ -1,0 +1,8 @@
+{% include 'admin/_head.html' %}
+<p><a href="{{ ('/admin/students/' ~ st.id) if st else '/admin/students' }}">← Back</a></p>
+<form method="post" action="{{ action }}" class="card form" novalidate><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% if vals['from'] %}<input type="hidden" name="from" value="{{ vals['from'] }}"><p class="ok">Details copied from the admission form. Check them, then save.</p>{% endif %}
+{% for f in fields %}{% with f=f, val=vals[f.k], errs=errs %}{% include 'admin/_field.html' %}{% endwith %}{% endfor %}
+{% if not st %}{% with f={'k': 'batch_id', 'l': 'Enrol in a batch now (optional)', 't': 'select', 'options': batches, 'blank': '— not now —', 'help': 'You can also do this later from the student’s page. Fee is taken from the course.'}, val=vals.batch_id, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}{% endif %}
+<div class="btnrow"><button class="btn">{{ 'Save changes' if st else 'Create student and login' }}</button><a class="btn o" href="{{ ('/admin/students/' ~ st.id) if st else '/admin/students' }}">Cancel</a></div></form>
+{% include 'admin/_foot.html' %}

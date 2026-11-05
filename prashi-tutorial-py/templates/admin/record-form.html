@@ -1,0 +1,20 @@
+{% include 'admin/_head.html' %}
+{% set typeopts = [] %}{% for t in TYPES %}{% set _ = typeopts.append({'v': t[0], 'l': t[1]}) %}{% endfor %}
+<p><a href="/admin/records">← All records</a></p>
+<form method="post" action="{{ action }}?_csrf={{ csrfToken }}" enctype="multipart/form-data" class="card form" novalidate>
+{% if errs and errs|length %}<div class="bad" role="alert">Please fix the highlighted problems.</div>{% endif %}
+{% set one_result = rec and rec.type == 'mock_result' and rec.student_id %}
+{% if one_result %}<p class="mu">Result for <b>{{ rec.student_name }}</b>: <b>{{ rec.score }} / {{ rec.max_score }}</b>. To change the marks, delete this row and upload the sheet again.</p>{% else %}
+{% with f={'k': 'batch_id', 'l': 'Batch', 't': 'select', 'req': 1, 'options': batches, 'blank': '— choose a batch —'}, val=vals.batch_id, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'type', 'l': 'What is it?', 't': 'select', 'req': 1, 'options': typeopts}, val=vals.type, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% endif %}
+{% with f={'k': 'title', 'l': 'Title', 't': 'text', 'req': 1, 'help': 'Example: Physics – Chapter 3 notes, or Mock Test 4'}, val=vals.title, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'body', 'l': 'Message', 't': 'textarea', 'rows': 3, 'help': 'Optional for material – a short note for the students.'}, val=vals.body, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% if not one_result %}<p class="mu" data-when-type="mock_result" hidden>Choose the batch, then <a class="btn o sm" href="#" id="rt-link" data-base="/admin/records/result-template.xlsx?batch=">⬇ Download the Excel marksheet</a> — it lists the batch's students. Fill in <b>Marks</b> and <b>Out of</b>, save it, and upload it below. Each student sees only their own marks; the sheet itself is not kept.</p>
+{% with f={'k': 'file', 'l': 'Attach a file', 't': 'file', 'help': 'Material: PDF, Word, PowerPoint, Excel, text, ZIP, JPG or PNG. Result: the filled Excel marksheet. Up to 20 MB.'}, val=('1' if (rec and rec.file_path) else ''), errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% endif %}
+{% if rec and rec.file_path %}<label class="chk"><input type="checkbox" name="_remove_file" value="1"> <span>Remove the current file</span></label> <a href="/admin/records/{{ rec.id }}/file">Download current file</a>{% endif %}
+{% with f={'k': 'record_date', 'l': 'Date', 't': 'date'}, val=vals.record_date, errs=errs %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'visible_to_student', 'l': 'Show to the batch’s students now', 't': 'checkbox'}, val=vals.visible_to_student, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+<div class="btnrow"><button class="btn">Save record</button><a class="btn o" href="/admin/records">Cancel</a></div></form>
+{% include 'admin/_foot.html' %}

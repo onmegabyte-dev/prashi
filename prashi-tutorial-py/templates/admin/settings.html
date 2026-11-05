@@ -1,0 +1,7 @@
+{% include 'admin/_head.html' %}
+{% if errs|length %}<div class="bad" role="alert"><b>Please fix:</b><ul style="margin-left:20px">{% for e in errs %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<form method="post" action="/admin/settings" class="form" novalidate><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% for g in groups %}<fieldset class="card" style="margin-bottom:18px;border:1px solid var(--bd)"><legend style="padding:0 8px;font-weight:700">{{ g[0] }}</legend>
+{% for d in g[1] %}{% set t = d[2] %}{% with f={'k': d[0], 'l': d[1], 't': ('textarea' if t == 'textarea' else ('email' if t == 'email' else ('number' if t == 'number' else 'text'))), 'help': d[3], 'req': d[4], 'rows': 3}, val=vals[d[0]], errs={} %}{% include 'admin/_field.html' %}{% endwith %}{% endfor %}</fieldset>{% endfor %}
+<div class="btnrow"><button class="btn">Save settings</button></div></form>
+{% include 'admin/_foot.html' %}

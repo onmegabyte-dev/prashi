@@ -1,0 +1,7 @@
+{% include 'portal/_head.html' %}
+<form method="get" class="tools" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"><label class="sr" for="q">Search</label><input id="q" type="search" name="q" value="{{ q }}" placeholder="Search material" style="max-width:260px">
+<label class="sr" for="t">Type</label><select id="t" name="type" style="max-width:200px"><option value="">All types</option>{% for t in [['material','Study material'],['notes','Notes'],['test_paper','Test papers']] %}<option value="{{ t[0] }}" {{ 'selected' if type == t[0] else '' }}>{{ t[1] }}</option>{% endfor %}</select><button class="btn o" style="padding:8px 16px">Filter</button></form>
+<div class="list">{% for m in rows %}<div class="item"><h3>{{ m.title }}</h3><span class="meta">{{ TYPE[m.type] }}{{ (' · ' ~ m.batch_name) if m.batch_name else '' }}{{ (' · ' ~ fmtDate(m.record_date)) if m.record_date else '' }}</span>
+{% if m.body %}<p class="mu" style="white-space:pre-wrap">{{ m.body }}</p>{% endif %}{% if m.file_path %}<p><a class="btn" style="margin-top:8px" href="/portal/files/{{ m.id }}">⬇ Download</a></p>{% endif %}</div>{% endfor %}
+{% if not rows %}<p class="empty">Nothing here yet. Your teachers will share material as the course goes on.</p>{% endif %}</div>
+{% include 'portal/_foot.html' %}

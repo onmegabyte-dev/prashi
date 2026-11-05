@@ -1,0 +1,13 @@
+{% include 'admin/_head.html' %}
+<p><a class="btn" href="/admin/data-export/all.zip" title="Downloads all {{ tables|length }} Excel files in one ZIP">Download all {{ tables|length }} files (ZIP)</a></p>
+<div class="stats" style="margin-top:18px">
+{% for t in tables %}
+  <div class="card">
+    <h3>{{ t.title }}</h3>
+    <p class="mu">{{ t.help }}</p>
+    <p class="mu"><b>{{ t.rows }}</b> row{{ '' if t.rows == 1 else 's' }} · <code>{{ t.name }}.xlsx</code></p>
+    <a class="btn o sm" href="/admin/data-export/{{ t.name }}.xlsx" aria-label="Download {{ t.title }} as Excel">Download Excel</a>
+  </div>
+{% endfor %}
+</div>
+{% include 'admin/_foot.html' %}

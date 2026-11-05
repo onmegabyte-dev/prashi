@@ -1,0 +1,7 @@
+{% include 'partials/head.html' %}
+{% with h1='Admissions', sub=s.admissions_intro %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w">{% set steps = parseItems(s.admissions_steps) %}{% if steps|length %}<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">{% for x in steps %}<div class="card rv"><span class="tag">Step {{ loop.index }}</span><h3>{{ x.t }}</h3><p class="mu">{{ x.d }}</p></div>{% endfor %}</div>{% endif %}
+<div class="grid" style="margin-top:34px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+<div class="card"><h2 style="font-size:1.4rem">Register</h2>{% with key='admission', fields=admission, btn='Submit registration' %}{% include 'partials/form.html' %}{% endwith %}</div>
+<div class="card"><h2 style="font-size:1.4rem">Eligibility & dates</h2>{% if s.admissions_eligibility %}<p class="mu" style="margin:10px 0">{{ s.admissions_eligibility }}</p>{% endif %}{% if s.admissions_dates %}<p class="mu">{{ s.admissions_dates }}</p>{% endif %}<h3 style="margin-top:22px">Free counselling</h3>{% with key='counselling', fields=counselling, btn='Request a call back', pick='' %}{% include 'partials/form.html' %}{% endwith %}</div></div></div></section>
+{% include 'partials/foot.html' %}

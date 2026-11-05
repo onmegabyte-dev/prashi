@@ -1,0 +1,28 @@
+{% include 'admin/_head.html' %}
+{% set typeopts = [] %}{% for t in TYPES %}{% set _ = typeopts.append({'v': t[0], 'l': t[1]}) %}{% endfor %}
+<div class="tools" role="tablist" aria-label="Choose a form" style="margin-bottom:14px">{% for k in FORMS %}<a class="btn {{ '' if k == form else 'o' }} sm" href="?form={{ k }}" {{ 'aria-current=page' if k == form else '' }}>{{ FORMS[k] }}</a>{% endfor %}</div>
+{% if errs|length %}<div class="bad" role="alert"><ul style="margin-left:20px">{% for e in errs %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Question</th><th>Type</th><th>Required?</th><th>Showing?</th><th>Actions</th></tr></thead><tbody>
+{% for fl in fields %}<tr style="{{ '' if fl.active else 'opacity:.55' }}">
+<td data-label="Question"><b>{{ fl.label }}</b>{% if fl.locked %} <span class="pill off" title="Core field: can be renamed but not removed">core</span>{% endif %}<br><span class="mu">key: {{ fl.name }}</span></td>
+<td data-label="Type">{% set tl = [] %}{% for t in TYPES %}{% if t[0] == fl.type %}{% set _ = tl.append(t[1]) %}{% endif %}{% endfor %}{{ tl[0] if tl else fl.type }}</td>
+<td data-label="Required?">{{ 'Yes' if fl.required else 'No' }}</td><td data-label="Showing?">{{ 'Yes' if fl.active else 'Hidden' }}</td>
+<td class="acts">
+<a class="btn o sm" href="/admin/forms/field/{{ fl.id }}">Edit</a>
+{% if not fl.locked %}<form method="post" action="/admin/forms/field/{{ fl.id }}/required"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm">{{ 'Make optional' if fl.required else 'Make required' }}</button></form>
+<form method="post" action="/admin/forms/field/{{ fl.id }}/active"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm">{{ 'Hide' if fl.active else 'Show' }}</button></form>{% endif %}
+<form method="post" action="/admin/forms/field/{{ fl.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="dir" value="up"><button class="btn o sm" aria-label="Move up" {{ 'disabled' if loop.first else '' }}>▲</button></form>
+<form method="post" action="/admin/forms/field/{{ fl.id }}/move"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="dir" value="down"><button class="btn o sm" aria-label="Move down" {{ 'disabled' if loop.last else '' }}>▼</button></form>
+{% if not fl.locked %}<form method="post" action="/admin/forms/field/{{ fl.id }}/delete" data-confirm="Delete “{{ fl.label }}” from this form? Answers already received are kept."><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm">Delete</button></form>{% endif %}
+</td></tr>{% endfor %}</tbody></table></div>
+<div class="two" style="margin-top:22px">
+<form method="post" action="/admin/forms/add" class="card form" novalidate><h2>Add a question to the {{ FORMS[form]|lower }}</h2><input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="form" value="{{ form }}">
+{% with f={'k': 'label', 'l': 'Question', 't': 'text', 'req': 1, 'help': 'What the visitor sees. Example: Previous school'}, val=values.label, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'type', 'l': 'Answer type', 't': 'select', 'req': 1, 'options': typeopts, 'help': 'Short text suits most questions. Choose Drop-down to give a fixed list of choices.'}, val=(values.type or 'text'), errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'options', 'l': 'Choices (drop-down only)', 't': 'textarea', 'rows': 3, 'help': 'One choice per line.'}, val=values.options, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'help_text', 'l': 'Small hint under the question (optional)', 't': 'text'}, val=values.help_text, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+{% with f={'k': 'required', 'l': 'Required – the form cannot be sent without it', 't': 'checkbox'}, val=values.required, errs={} %}{% include 'admin/_field.html' %}{% endwith %}
+<div class="btnrow"><button class="btn">Add question</button></div></form>
+<div class="card"><h2>Preview – what visitors see</h2><p class="mu">This is a live preview. The form is switched off here.</p>
+<fieldset disabled style="border:0;padding:0">{% with key=form, fields=preview, btn='Submit' %}{% include 'partials/form.html' %}{% endwith %}</fieldset></div></div>
+{% include 'admin/_foot.html' %}

@@ -1,0 +1,4 @@
+{% include 'partials/head.html' %}
+{% with h1='Privacy Policy', sub='How we collect and protect your information.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w prose">{{ richText(s.privacy_html) }}</div></section>
+{% include 'partials/foot.html' %}

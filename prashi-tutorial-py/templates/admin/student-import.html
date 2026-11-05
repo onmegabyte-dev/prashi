@@ -1,0 +1,17 @@
+{% include 'admin/_head.html' %}
+<p><a href="/admin/students">← All students</a></p>
+{% if error %}<div class="bad" role="alert">{{ error }}</div>{% endif %}
+<div class="two">
+<section class="card form"><h2>1. Get the template</h2><p class="mu">A spreadsheet with the right column names. Fill one student per row.</p>
+<p><a class="btn o" href="/admin/students/import/template.csv">⬇ Download template (CSV)</a></p>
+<h2 style="margin-top:22px">2. Upload your file</h2>
+<form method="post" action="/admin/students/import/preview?_csrf={{ csrfToken }}" enctype="multipart/form-data">
+<label for="file">CSV file (up to 200 students, 1 MB)</label><input type="file" id="file" name="file" accept=".csv,text/csv" required>
+<small class="mu">Excel: File → Save As → “CSV UTF-8 (Comma delimited)”. Google Sheets: File → Download → CSV.</small>
+<div class="btnrow"><button class="btn">Upload and check</button></div></form>
+<p class="mu">You will see a preview first. Nothing is created until you confirm.</p></section>
+<section class="card"><h2>Columns</h2><p class="mu">Only <b>name</b> and a <b>parent phone or parent email</b> are required.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Column</th><th>What to write</th></tr></thead><tbody>
+{% for c in COLUMNS %}<tr><td data-label="Column"><code>{{ c[0] }}</code></td><td data-label="What to write">{{ c[1] }}{% if c[2] %}<br><span class="mu">e.g. {{ c[2] }}</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div></section>
+</div>
+{% include 'admin/_foot.html' %}

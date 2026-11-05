@@ -1,0 +1,20 @@
+{% include 'admin/_head.html' %}
+<div class="bar-tools"><form method="get" class="tools" role="search">
+<input type="search" name="q" value="{{ f.q }}" placeholder="Search question text…" aria-label="Search">
+<select name="batch" aria-label="Batch"><option value="">All batches</option>{% for b in batches %}<option value="{{ b.v }}" {{ 'selected' if f.batch == (b.v|string) else '' }}>{{ b.l }}</option>{% endfor %}</select>
+<select name="class_level" aria-label="Class"><option value="">All classes</option>{% for o in classes %}<option {{ 'selected' if f.class_level == o.v else '' }}>{{ o.v }}</option>{% endfor %}</select>
+<select name="subject" aria-label="Subject"><option value="">All subjects</option>{% for o in subjects %}<option {{ 'selected' if f.subject == o.v else '' }}>{{ o.v }}</option>{% endfor %}</select>
+<select name="chapter" aria-label="Chapter"><option value="">All chapters</option>{% for o in chapters %}<option {{ 'selected' if f.chapter == o.v else '' }}>{{ o.v }}</option>{% endfor %}</select>
+<select name="q_type" aria-label="Question type"><option value="">All types</option>{% for o in qtypes %}<option {{ 'selected' if f.q_type == o.v else '' }}>{{ o.v }}</option>{% endfor %}</select>
+<button class="btn o sm">Search</button><a class="btn o sm" href="/admin/qbank">Clear</a></form>
+<a class="btn" href="/admin/qbank/upload">+ Upload questions</a></div>
+<p class="mu">{{ total }} question{{ '' if total == 1 else 's' }}.</p>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Class</th><th>Subject</th><th>Chapter</th><th>Type</th><th>Q-ID</th><th>Question</th><th>Batch</th><th>Added by</th>{% if user.role == 'admin' %}<th>Actions</th>{% endif %}</tr></thead><tbody>
+{% for r in rows %}<tr><td data-label="Class">{{ r.class_level }}</td><td data-label="Subject">{{ r.subject }}</td><td data-label="Chapter">{{ r.chapter }}</td><td data-label="Type">{{ r.q_type }}</td><td data-label="Q-ID">{{ r.qid }}</td>
+<td data-label="Question" style="white-space:pre-wrap;max-width:420px">{{ r.question_text }}</td><td data-label="Batch">{{ r.batch_name or '—' }}</td><td data-label="Added by">{{ r.created_by_name or '—' }}<br><span class="mu">{{ showUtc(r.created_at) }}</span></td>
+{% if user.role == 'admin' %}<td class="acts"><form method="post" action="/admin/qbank/{{ r.id }}/delete" data-confirm="Delete this question permanently?"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn dng sm">Delete</button></form></td>{% endif %}</tr>{% endfor %}
+{% if not rows %}<tr><td colspan="9" class="mu">No questions yet. Click “+ Upload questions”.</td></tr>{% endif %}</tbody></table></div>
+{% with qsp=qsp %}{% include 'admin/_pager.html' %}{% endwith %}
+{% if uploads %}<section class="card" style="margin-top:22px"><h2>Recent uploads</h2><div class="tbl-wrap"><table class="tbl"><thead><tr><th>When</th><th>File</th><th>Filed under</th><th>Saved</th><th>By</th></tr></thead><tbody>
+{% for u in uploads %}<tr><td data-label="When">{{ showUtc(u.created_at) }}</td><td data-label="File">{{ u.file_name }}</td><td data-label="Filed under">{{ u.class_level }} · {{ u.subject }} · {{ u.chapter }} · {{ u.q_type }}</td><td data-label="Saved">{{ u.question_count }}{% if u.skipped_count %} <span class="mu">({{ u.skipped_count }} duplicates skipped)</span>{% endif %}</td><td data-label="By">{{ u.uploaded_by_name or '—' }}</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+{% include 'admin/_foot.html' %}

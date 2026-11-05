@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ title }}</title>
+<meta name="description" content="{{ desc }}">
+{% if noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+<link rel="canonical" href="{{ canonical }}">
+<meta property="og:title" content="{{ title }}"><meta property="og:description" content="{{ desc }}">
+<meta property="og:type" content="website"><meta property="og:url" content="{{ canonical }}"><meta property="og:image" content="{{ ogImage }}">
+<meta name="theme-color" content="#0a1030">
+<meta name="csrf-token" content="{{ csrfToken|default('') }}">
+<link rel="icon" href="/img/logo-original.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/site.css">
+<script src="/js/boot.js"></script>
+{% if orgLd %}<script type="application/ld+json">{{ json_ld(orgLd) }}</script>{% endif %}
+{% for x in ld %}<script type="application/ld+json">{{ json_ld(x) }}</script>{% endfor %}
+</head><body>
+<a class="skip" href="#app">Skip to content</a>
+{% if s.banner_text %}<div class="bnr" role="note">{{ s.banner_text }}</div>{% endif %}
+<nav id="nav" aria-label="Main"><div class="w"><a class="logo" href="/"><img src="/img/logo-original.jpg" alt="" width="34" height="34">{{ s.site_name }}</a>
+<button id="bg" aria-label="Menu" aria-expanded="false" aria-controls="lk">☰</button>
+<div class="links" id="lk"><a href="/" class="{{ 'on' if path == '/' else '' }}">Home</a>
+<div class="dd"><button aria-haspopup="true">About ▾</button><div><a href="/about">Our story</a><a href="/faculty">Faculty</a></div></div>
+<a href="/courses" class="{{ 'on' if path.startswith('/courses') else '' }}">Courses</a><a href="/results" class="{{ 'on' if path == '/results' else '' }}">Results</a><a href="/resources" class="{{ 'on' if path.startswith('/resources') else '' }}">Resources</a><a href="/contact" class="{{ 'on' if path == '/contact' else '' }}">Contact</a>
+<button id="theme" aria-label="Switch light/dark theme" title="Switch light/dark theme">◐</button>
+{% if user %}<a href="{{ '/portal' if user.role == 'student' else '/admin' }}" title="Go to your account" class="acct">{% if user.role == 'student' and user.photo %}<img class="mini" src="/portal/photo?v={{ user.photo }}" alt="" width="26" height="26">{% endif %}{{ 'My portal' if user.role == 'student' else 'Admin panel' }}</a>{% else %}<a href="/login" title="Students and staff sign in here">Login</a>{% endif %}
+<a class="btn" href="/admissions">Enroll Now</a></div></div></nav>
+<main id="app" tabindex="-1">

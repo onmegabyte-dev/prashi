@@ -1,0 +1,6 @@
+{% include 'partials/head.html' %}
+{% with h1='Resources', sub='Free guides, exam plans and news.' %}{% include 'partials/ph.html' %}{% endwith %}
+<section><div class="w"><div class="chips" id="rfilters"><input id="rq" type="search" placeholder="Search articles" aria-label="Search articles"><select id="rc" aria-label="Category"><option value="">All categories</option>{% for x in articles|map(attribute='category')|select|unique %}<option>{{ x }}</option>{% endfor %}</select></div>
+<div class="grid" id="rl">{% for a in articles %}<article class="card tilt rv" data-cat="{{ a.category }}" data-q="{{ (a.title ~ ' ' ~ (a.summary or ''))|lower }}">{% if a.cover_image %}<img class="cimg" src="/uploads/{{ a.cover_image }}" alt="" loading="lazy">{% endif %}<span class="tag">{{ a.category }}</span><h3><a href="/resources/{{ a.slug }}">{{ a.title }}</a></h3><p class="mu">{{ a.summary }}</p><a class="btn o" style="margin-top:10px" href="/resources/{{ a.slug }}">Read</a></article>{% endfor %}</div>
+<p class="mu" id="none" hidden>No articles found. Try another search.</p></div></section>
+{% include 'partials/foot.html' %}

@@ -1,0 +1,15 @@
+{% include 'partials/head.html' %}
+<section style="padding-top:50px"><div class="w" style="max-width:460px"><div class="card">
+<h1 style="font-size:1.8rem">Forgot password</h1>
+{% if sent %}
+<div class="ok" role="status">If that login exists, we have emailed a link to reset the password. It works for 1 hour. If nothing arrives, ask the institute office to reset it for you.</div>
+{% else %}
+<p class="mu">Enter your email or username. We will email a reset link to the address the institute has on file.</p>
+{% if error %}<div class="bad" role="alert">{{ error }}</div>{% endif %}
+<form method="post" action="/forgot"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<label for="identifier">Email or username</label><input id="identifier" name="identifier" autocomplete="username" required autofocus>
+<button class="btn" style="margin-top:18px;width:100%">Send reset link</button></form>
+{% endif %}
+<p style="margin-top:16px"><a style="text-decoration:underline" href="/login">← Back to sign in</a></p>
+</div></div></section>
+{% include 'partials/foot.html' %}

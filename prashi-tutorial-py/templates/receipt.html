@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><title>Receipt {{ rc.receipt_no }} – {{ s.site_name }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/receipt.css"></head><body>
+<div class="bar"><a href="{{ back }}">← Back</a><button type="button" data-print>🖨 Print receipt</button></div>
+<main class="rc">
+<div class="hd"><img src="/img/logo-original.jpg" alt=""><div><h1>{{ s.site_name }}</h1><p>{{ s.address }}<br>{{ s.phone }} · {{ s.email }}{% if s.receipt_reg_line %}<br>{{ s.receipt_reg_line }}{% endif %}</p></div></div>
+<h2>FEE RECEIPT</h2>
+<div class="meta"><span><b>Receipt no.:</b> {{ rc.receipt_no }}</span><span><b>Date:</b> {{ fmtDate(rc.paid_on) }}</span></div>
+<table><tbody>
+<tr><th>Received from</th><td>{{ rc.student_name }} <span style="color:#555">(Admission no. {{ rc.admission_no }})</span>{% if rc.parent_name %}<br>Parent / guardian: {{ rc.parent_name }}{% endif %}</td></tr>
+<tr><th>Class</th><td>{{ rc.class_level or '—' }}</td></tr>
+<tr><th>Towards</th><td>{{ rc.course_name }} – {{ rc.batch_name }}</td></tr>
+<tr><th>Amount received</th><td><span class="amt">{{ money(rc.amount) }}</span><br><span class="words">{{ rc.words }}</span></td></tr>
+<tr><th>Payment mode</th><td>{{ rc.mode }}</td></tr>
+<tr><th>Total fee payable</th><td>{{ money(rc.payable) }} <span style="color:#555">(fee {{ money(rc.fee_total) }}{{ (' − discount ' ~ money(rc.discount)) if rc.discount else '' }})</span></td></tr>
+<tr><th>Paid up to this receipt</th><td>{{ money(rc.paid_to_date) }}</td></tr>
+<tr><th>Balance after this payment</th><td><b>{{ money(rc.balance_after) }}</b></td></tr>
+</tbody></table>
+<div class="foot"><span class="note">{% if rc.recorded_by_name %}Received by {{ rc.recorded_by_name }}{% endif %}</span><span class="sig">Authorised signatory</span></div>
+{% if s.receipt_note %}<p class="note">{{ s.receipt_note }}</p>{% endif %}
+</main><script src="/js/admin.js" defer></script></body></html>

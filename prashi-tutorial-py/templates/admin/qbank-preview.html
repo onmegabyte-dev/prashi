@@ -1,0 +1,13 @@
+{% include 'admin/_head.html' %}
+<p><a href="/admin/qbank/upload">← Start again</a></p>
+<section class="card"><p><b>{{ items|length }}</b> question{{ '' if items|length == 1 else 's' }} found in <b>{{ file_name }}</b>. They will be saved under:</p>
+<p><span class="tag">{{ m.batch_name }}</span> <span class="tag">{{ m.class_level }}</span> <span class="tag">{{ m.subject }}</span> <span class="tag">{{ m.chapter }}</span> <span class="tag">{{ m.q_type }}</span></p>
+{% if dups %}<p class="mu">{{ dups }} {{ 'is' if dups == 1 else 'are' }} already in the bank and unticked.</p>{% endif %}</section>
+<form method="post" action="/admin/qbank/save" class="card form" style="margin-top:16px"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% for k, v in [('batch_id', m.batch_id), ('class_level', m.class_level), ('subject', m.subject), ('chapter', m.chapter), ('q_type', m.q_type), ('file_name', file_name)] %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endfor %}
+<input type="hidden" name="count" value="{{ items|length }}">
+<p class="mu">Fix the wording if needed, and untick anything that is not a real question (for example a heading).</p>
+{% for it in items %}<div class="fld" style="display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start"><label class="chk" style="margin-top:8px"><input type="checkbox" name="keep_{{ loop.index0 }}" value="1" {{ '' if it.dup else 'checked' }} aria-label="Keep question {{ loop.index }}"> <span>{{ loop.index }}</span></label>
+<div><textarea name="q_{{ loop.index0 }}" rows="{{ [2, [6, (it.text|length // 70) + 1]|min]|max }}" maxlength="{{ MAX_LEN }}">{{ it.text }}</textarea>{% if it.dup %}<small class="mu">Already in the bank</small>{% endif %}</div></div>{% endfor %}
+<div class="btnrow"><button class="btn">Save questions</button><a class="btn o" href="/admin/qbank">Cancel</a></div></form>
+{% include 'admin/_foot.html' %}

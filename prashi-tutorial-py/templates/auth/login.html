@@ -1,0 +1,19 @@
+{% include 'partials/head.html' %}
+<section style="padding-top:50px"><div class="w" style="max-width:460px">
+<div class="card">
+<h1 style="font-size:1.8rem">Sign in</h1>
+<p class="mu">Students, parents and staff sign in here. Your login was given to you by the institute office.</p>
+{% if flash %}<div class="ok" role="status">{{ flash.msg }}</div>{% endif %}
+{% if error %}<div class="bad" role="alert">{{ error }}</div>{% endif %}
+<form method="post" action="/login" novalidate>
+<input type="hidden" name="_csrf" value="{{ csrfToken }}"><input type="hidden" name="next" value="{{ next }}">
+<label for="identifier">Email or username</label>
+<input id="identifier" name="identifier" value="{{ identifier }}" autocomplete="username" autocapitalize="none" spellcheck="false" required autofocus>
+<label for="password">Password</label>
+<input id="password" name="password" type="password" autocomplete="current-password" required>
+<label class="chk"><input type="checkbox" id="showpw" data-show="password"> <span>Show password</span></label>
+<button class="btn" style="margin-top:18px;width:100%">Sign in</button>
+</form>
+<p style="margin-top:16px"><a style="text-decoration:underline" href="/forgot">Forgot your password?</a></p>
+</div></div></section>
+{% include 'partials/foot.html' %}

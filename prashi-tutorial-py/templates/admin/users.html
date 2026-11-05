@@ -1,0 +1,13 @@
+{% include 'admin/_head.html' %}
+<div class="two users-two">
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Last sign-in</th><th>Actions</th></tr></thead><tbody>
+{% for u in rows %}<tr><td data-label="Name"><b>{{ u.name }}</b> {% if not u.active %}<span class="pill off">Switched off</span>{% endif %}</td><td data-label="Email">{{ u.email }}</td><td data-label="Role">{{ u.role }}</td><td data-label="Last sign-in">{{ showUtc(u.last_login_at) if u.last_login_at else 'never' }}</td>
+<td class="acts">
+<form method="post" action="/admin/users/{{ u.id }}/reset" data-confirm="Reset the password for {{ u.name }}? They will be signed out and given a new temporary password."><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm">Reset password</button></form>
+{% if u.id != user.id %}<form method="post" action="/admin/users/{{ u.id }}/toggle" data-confirm="{{ 'Switch off this login? They will be signed out straight away.' if u.active else 'Switch this login back on?' }}"><input type="hidden" name="_csrf" value="{{ csrfToken }}"><button class="btn o sm">{{ 'Switch off' if u.active else 'Switch on' }}</button></form>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>
+<form method="post" action="/admin/users" class="card form"><h2>Add a staff login</h2><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% for f in [{'k':'name','l':'Full name','t':'text','req':1},{'k':'email','l':'Email (used to sign in)','t':'email','req':1},{'k':'role','l':'Role','t':'select','req':1,'options':roleOpts,'help':'Staff cannot change website content, settings or other logins.'}] %}{% with f=f, val=('staff' if f.k == 'role' else ''), errs={} %}{% include 'admin/_field.html' %}{% endwith %}{% endfor %}
+<div class="btnrow"><button class="btn">Create login</button></div></form>
+</div>
+{% include 'admin/_foot.html' %}

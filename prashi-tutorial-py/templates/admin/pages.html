@@ -1,0 +1,15 @@
+{% include 'admin/_head.html' %}
+{% if errs|length %}<div class="bad" role="alert">Please fix the highlighted problems (the section with a problem is open).</div>{% endif %}
+<p class="tools">{% for g in groups %}<a class="btn o sm" href="?g={{ g.id }}#g_{{ g.id }}">{{ g.label }}</a>{% endfor %}</p>
+<form method="post" action="/admin/pages" novalidate class="form" style="max-width:860px"><input type="hidden" name="_csrf" value="{{ csrfToken }}">
+{% for g in groups %}
+<details class="card" id="g_{{ g.id }}" style="margin-bottom:14px" {{ 'open' if open == g.id else '' }}>
+<summary style="cursor:pointer;font:700 1.05rem Sora">{{ g.label }}</summary>
+<p class="mu">{{ g.where }}</p>
+{% for f in g.fields %}{% with f=f, val=vals[f.k], errs=errs %}{% include 'admin/_field.html' %}{% endwith %}{% endfor %}
+<div class="btnrow"><button class="btn o sm" formaction="/admin/pages/reset" name="group" value="{{ g.id }}" formnovalidate data-confirm="Bring back the original sample wording for “{{ g.label }}”? Your edits in this section will be lost.">Reset this section to the original wording</button></div>
+</details>
+{% endfor %}
+<div class="btnrow" style="position:sticky;bottom:0;background:var(--bg);padding:12px 0"><button class="btn">Save page text</button><a class="btn o" href="/" target="_blank" rel="noopener">View website ↗</a></div>
+</form>
+{% include 'admin/_foot.html' %}

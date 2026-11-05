@@ -1,0 +1,21 @@
+{% include 'admin/_head.html' %}
+<div class="stats">
+  <a class="card" href="/admin/inbox?status=new&kind=enquiries" title="People who asked a question or requested a call back and have not been contacted"><span class="mu">New enquiries</span><b>{{ stats.newEnquiries }}</b><span class="mu">{{ stats.enq30 }} in the last 30 days</span></a>
+  <a class="card" href="/admin/inbox?status=new&form=admission" title="Admission forms nobody has followed up yet"><span class="mu">New registrations</span><b>{{ stats.newRegs }}</b><span class="mu">{{ stats.regs30 }} in the last 30 days</span></a>
+  <a class="card" href="/admin/students" title="Students with an active login"><span class="mu">Active students</span><b>{{ stats.students }}</b><span class="mu">&nbsp;</span></a>
+  <a class="card" href="/admin/c/batches" title="Batches that have not started yet and are not closed"><span class="mu">Upcoming batches</span><b>{{ stats.batches }}</b><span class="mu">&nbsp;</span></a>
+  <a class="card" href="/admin/doubts" title="Student questions waiting for a reply"><span class="mu">Open doubts</span><b>{{ stats.doubts }}</b><span class="mu">&nbsp;</span></a>
+</div>
+<div class="two">
+<section class="card"><h2>Latest enquiries &amp; registrations</h2>
+{% if not recent|length %}<p class="mu">Nothing yet. Forms filled on the website will appear here.</p>{% endif %}
+{% for r in recent %}<p><a href="/admin/inbox/{{ r.id }}"><b>{{ r.who }}</b></a> <span class="mu">· {{ r.form }} · {{ showUtc(r.created_at) }}</span> <span class="pill {{ r.status }}">{{ r.status.replace('_', ' ') }}</span></p>{% endfor %}
+<p><a class="btn o sm" href="/admin/inbox">Open inbox</a></p></section>
+<section class="card"><h2>Upcoming batches</h2>
+{% if not upcoming|length %}<p class="mu">No upcoming batches. Add one under Website content → Batches.</p>{% endif %}
+{% for b in upcoming %}<p><b>{{ b.course_name }}</b> – {{ b.name }}<br><span class="mu">Starts {{ fmtDate(b.start_date) }} · {{ b.seats_left }} of {{ b.seats_total }} seats left · {{ b.status }}</span></p>{% endfor %}</section>
+{% if activity|length %}<section class="card"><h2>Recent activity</h2>
+{% for a in activity %}<p><span class="mu">{{ showUtc(a.created_at) }}</span><br><b>{{ a.user_name or 'System' }}</b> – {{ a.summary }}</p>{% endfor %}
+<p><a class="btn o sm" href="/admin/activity">Full activity log</a></p></section>{% endif %}
+</div>
+{% include 'admin/_foot.html' %}
