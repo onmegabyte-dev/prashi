@@ -83,6 +83,10 @@ def ensure_ready():
         run('PRAGMA journal_mode = DELETE')                        # a plain journal: no ever-growing "-wal" file next to the database
     except Exception:                                              # noqa: BLE001  (e.g. another program has it open: harmless)
         pass
+    if has_table('chapter_access') and not any(c['name'] == 'q_type' for c in table_columns('chapter_access')):
+        run('DROP TABLE chapter_access')                           # first version (whole chapters, no types): never held real data
     script((ROOT / 'db' / 'qbank.sql').read_text(encoding='utf8'))
+    if not any(c['name'] == 'answer_text' for c in table_columns('questions')):
+        run('ALTER TABLE questions ADD COLUMN answer_text TEXT')
     script('CREATE TABLE IF NOT EXISTS sessions (sid TEXT PRIMARY KEY, sess TEXT NOT NULL, expires INTEGER NOT NULL, uid INTEGER);'
            'CREATE INDEX IF NOT EXISTS idx_sessions_uid ON sessions(uid);')
