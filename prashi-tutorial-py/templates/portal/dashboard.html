@@ -15,7 +15,4 @@
 {% for n in notices %}<div class="item"><h3>{{ n.title }}</h3><div class="prose mu">{{ clean(n.body_html) }}</div></div>{% endfor %}
 {% if not notices %}<p class="empty">No notices right now.</p>{% else %}<a class="btn o" href="/portal/notices">All notices</a>{% endif %}</div></section>
 </div>
-<section style="margin-top:20px"><h2>Latest study material</h2><div class="list">
-{% for m in materials %}<div class="item"><h3>{{ m.title }}</h3><span class="meta">{{ TYPE[m.type] }}{{ (' · ' ~ fmtDate(m.record_date)) if m.record_date else '' }}</span>{% if m.file_path %}<p><a class="btn" style="margin-top:8px" href="/portal/files/{{ m.id }}">⬇ Download</a></p>{% endif %}</div>{% endfor %}
-{% if not materials %}<p class="empty">Nothing has been shared with you yet.</p>{% else %}<a class="btn o" href="/portal/materials">See all</a>{% endif %}</div></section>
 {% include 'portal/_foot.html' %}
