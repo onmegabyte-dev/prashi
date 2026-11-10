@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS questions (
   -- the grain: class + subject + chapter + question type + qid (qid counts up inside that group)
   class_level TEXT NOT NULL COLLATE NOCASE, subject TEXT NOT NULL COLLATE NOCASE, chapter TEXT NOT NULL COLLATE NOCASE, q_type TEXT NOT NULL COLLATE NOCASE,
   qid INTEGER NOT NULL,
-  question_text TEXT NOT NULL, text_key TEXT NOT NULL,      -- text_key = lower-case, single-spaced text, used to skip duplicates
+  question_text TEXT NOT NULL, answer_text TEXT, text_key TEXT NOT NULL,      -- text_key = lower-case, single-spaced text, used to skip duplicates
   batch_id INTEGER REFERENCES batches(id) ON DELETE SET NULL, batch_name TEXT,
   upload_id INTEGER REFERENCES qb_uploads(id) ON DELETE SET NULL,
   created_by INTEGER REFERENCES users(id) ON DELETE SET NULL, created_by_name TEXT,
@@ -32,3 +32,14 @@ CREATE TABLE IF NOT EXISTS questions (
 );
 CREATE INDEX IF NOT EXISTS idx_questions_group ON questions(class_level, subject, chapter, q_type);
 CREATE INDEX IF NOT EXISTS idx_questions_batch ON questions(batch_id);
+
+-- A teacher publishes question types of a chapter to students: to all students of a class (batch_id NULL) or to the students of one batch.
+-- Published students see those questions, with their answers, in the student portal (Class > Subject > Chapter > Question type).
+CREATE TABLE IF NOT EXISTS chapter_access (
+  id INTEGER PRIMARY KEY,
+  class_level TEXT NOT NULL COLLATE NOCASE, subject TEXT NOT NULL COLLATE NOCASE, chapter TEXT NOT NULL COLLATE NOCASE, q_type TEXT NOT NULL COLLATE NOCASE,
+  batch_id INTEGER REFERENCES batches(id) ON DELETE CASCADE,
+  enabled_by INTEGER REFERENCES users(id) ON DELETE SET NULL, enabled_by_name TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_chapter_access_uq ON chapter_access(class_level, subject, chapter, q_type, COALESCE(batch_id, 0));
