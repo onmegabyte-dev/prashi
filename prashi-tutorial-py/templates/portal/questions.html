@@ -1,0 +1,13 @@
+{% include 'portal/_head.html' %}
+{% set base = '/portal/questions' %}
+{% if f.class_level %}<nav aria-label="Folder path" style="margin-bottom:12px;font-weight:600"><a href="{{ base }}">All folders</a> › <a href="{{ base }}?{{ {'class_level': f.class_level}|urlencode }}">{{ f.class_level }}</a>
+{% if f.subject %} › <a href="{{ base }}?{{ {'class_level': f.class_level, 'subject': f.subject}|urlencode }}">{{ f.subject }}</a>{% endif %}{% if f.chapter %} › {{ f.chapter }}{% endif %}</nav>{% endif %}
+{% if level == 'types' %}
+{% for t, qs in types %}<section style="margin-top:18px"><h2>📂 {{ t }}</h2><div class="list">
+{% for q in qs %}<div class="item"><span class="meta">Q{{ q.qid }}</span><p style="white-space:pre-wrap">{{ q.question_text }}</p>
+{% if q.answer_text %}<div class="ok" style="margin-top:8px"><b>Answer:</b> <span style="white-space:pre-wrap">{{ q.answer_text }}</span></div>{% else %}<p class="mu">Answer not added yet.</p>{% endif %}</div>{% endfor %}</div></section>{% endfor %}
+{% else %}<div class="list">{% for name in folders %}
+{% set q = {'class_level': name} if level == 'class' else ({'class_level': f.class_level, 'subject': name} if level == 'subject' else {'class_level': f.class_level, 'subject': f.subject, 'chapter': name}) %}
+<div class="item"><h3><a href="{{ base }}?{{ q|urlencode }}">📁 {{ name }}</a></h3></div>{% endfor %}
+{% if not folders %}<p class="empty">Nothing has been opened for you yet. Your teachers will publish questions and answers as the course goes on.</p>{% endif %}</div>{% endif %}
+{% include 'portal/_foot.html' %}
