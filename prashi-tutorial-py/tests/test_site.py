@@ -230,6 +230,66 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(one("SELECT COUNT(*) n FROM questions WHERE chapter = 'Cells'")['n'], 3)
         self.assertTrue(one("SELECT created_by_name FROM questions WHERE qid = 1")['created_by_name'])
 
+    def test_students_see_published_question_types_in_folders(self):
+        stu = Browser()
+        stu.login('pt000001')                                                           # Class 10, no batch
+        mk('staff', 'Chapter Teacher', 'chapter.teacher@test.example')                  # test_question_bank deletes staff@test.example
+        staff = Browser()
+        staff.login('chapter.teacher@test.example')
+        base = {'class_level': 'Class 10', 'subject': 'Physics', 'chapter': 'ZZ Motion'}
+        ins = 'INSERT INTO questions (class_level, subject, chapter, q_type, qid, question_text, answer_text, text_key) VALUES (?,?,?,?,?,?,?,?)'
+        run(ins, 'Class 10', 'Physics', 'ZZ Motion', '1 Mark', 1, 'Define speed.', 'Distance / time', 'a')
+        run(ins, 'Class 10', 'Physics', 'ZZ Motion', '1 Mark', 2, 'Unit of force?', None, 'b')
+        run(ins, 'Class 10', 'Physics', 'ZZ Motion', '5 Marks', 1, 'Derive v = u + at.', 'Long derivation', 'c')
+        run(ins, 'Class 9', 'Physics', 'ZZ Motion', '1 Mark', 1, 'Other class Q', 'x', 'd')
+        # teacher folders
+        self.assertIn('Class 10', staff.c.get('/admin/qbank').text)
+        self.assertIn('Physics', staff.c.get('/admin/qbank?class_level=Class+10').text)
+        self.assertIn('ZZ Motion', staff.c.get('/admin/qbank?class_level=Class+10&subject=Physics').text)
+        page = staff.c.get('/admin/qbank?class_level=Class+10&subject=Physics&chapter=ZZ+Motion').text
+        self.assertIn('Distance / time', page)
+        self.assertIn('5 Marks', page)
+        # nothing published yet
+        self.assertNotIn('Physics', stu.c.get('/portal/questions').text)
+        # whole class, 1 Mark only
+        staff.post('/admin/qbank/publish', {**base, 'batch_id': '', 'types': ['1 Mark']})
+        self.assertIn('Class 10', stu.c.get('/portal/questions').text)
+        self.assertIn('Physics', stu.c.get('/portal/questions?class_level=Class+10').text)
+        self.assertIn('ZZ Motion', stu.c.get('/portal/questions?class_level=Class+10&subject=Physics').text)
+        page = stu.c.get('/portal/questions?class_level=Class+10&subject=Physics&chapter=ZZ+Motion').text
+        self.assertIn('Distance / time', page)
+        self.assertIn('Answer not added yet', page)
+        self.assertNotIn('Derive v', page)                                              # 5 Marks not published
+        self.assertNotIn('Other class Q', page)
+        # a batch the student is not in, and a class that is not theirs
+        staff.post('/admin/qbank/publish', {**base, 'batch_id': '1', 'types': ['5 Marks']})
+        self.assertNotIn('Derive v', stu.c.get('/portal/questions?class_level=Class+10&subject=Physics&chapter=ZZ+Motion').text)
+        self.assertEqual(stu.c.get('/portal/questions?class_level=Class+9&subject=Physics&chapter=ZZ+Motion').status_code, 404)
+        # teacher adds an answer; unpublishing hides everything
+        staff.post('/admin/qbank/%d/answer' % one("SELECT id FROM questions WHERE question_text = 'Unit of force?'")['id'], {'answer': 'Newton'})
+        self.assertIn('Newton', stu.c.get('/portal/questions?class_level=Class+10&subject=Physics&chapter=ZZ+Motion').text)
+        staff.post('/admin/qbank/publish', {**base, 'batch_id': ''})
+        self.assertEqual(stu.c.get('/portal/questions?class_level=Class+10&subject=Physics&chapter=ZZ+Motion').status_code, 404)
+        self.assertEqual(staff.post('/admin/qbank/publish', {**base, 'batch_id': '999', 'types': ['1 Mark']}).status_code, 302)
+        self.assertEqual(one("SELECT COUNT(*) n FROM chapter_access WHERE batch_id IS NULL")['n'], 0)
+        # study material is gone from the student portal
+        self.assertEqual(stu.c.get('/portal/materials').status_code, 404)
+        self.assertNotIn('Study material', stu.c.get('/portal').text)
+        from pt.admin.qbank import split_answer
+        from pt.qbank_parse import drop_page_noise
+        from pt.qbank_samples import SAMPLES, sample_text
+        from pt.qbank_parse import split_questions
+        for n in SAMPLES:                                                               # every sample must parse into questions that all carry an answer
+            qs = split_questions(drop_page_noise([(ln, False) for ln in sample_text(n).split('=' * 60)[-1].splitlines()]))
+            self.assertTrue(qs and all(split_answer(q)[1] for q in qs), n)
+        self.assertEqual(staff.c.get('/admin/qbank/sample/3.txt').status_code, 200)
+        self.assertEqual(staff.c.get('/admin/qbank/sample/9.txt').status_code, 404)
+        pdf_like = [('Q1. First?', False), ('Answer: Yes', False), ('Laws', False), ('Page 2', False), ('Laws', False), ('Laws', False),
+                    ('Section B – Numerical', False), ('Q2. Second?', False), ('Answer: No', False), ('Quick Revision', False), ('F = ma', False)]
+        self.assertEqual([split_answer(q)[1] for q in split_questions(drop_page_noise(pdf_like))], ['Yes', 'No'])
+        self.assertEqual(split_answer('What is a cell?\nAns: The unit of life'), ('What is a cell?', 'The unit of life'))
+        self.assertEqual(split_answer('Define osmosis.'), ('Define osmosis.', None))
+
     def test_exports(self):
         a = Browser()
         a.login('admin@test.example')
