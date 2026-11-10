@@ -7,6 +7,8 @@
 <input type="text" name="{{ field }}_custom" maxlength="40" value="{{ vals[field ~ '_custom'] or (cur if (cur and cur not in options and cur != CUSTOM) else '') }}" placeholder="Type the {{ label|lower }}" data-custom-for="{{ field }}" style="margin-top:8px" {{ '' if is_custom else 'hidden' }}>
 {% if errs[field] %}<div class="err" role="alert">{{ errs[field] }}</div>{% endif %}</div>
 {% endmacro %}
+<section class="card" style="margin-bottom:16px"><h2>Sample files</h2><p class="mu">Not sure how to write the file? Download the sample for your question type, copy its layout, and add your own questions and answers.</p>
+<p>{% for n, name in samples %}<a class="btn o sm" href="/admin/qbank/sample/{{ n }}.txt" download>{{ name }}</a> {% endfor %}</p></section>
 <form method="post" action="/admin/qbank/upload?_csrf={{ csrfToken }}" enctype="multipart/form-data" class="card form" novalidate>
 {% if errs and errs|length %}<div class="bad" role="alert">Please fix the highlighted problems.</div>{% endif %}
 <div class="fld"><label for="f_batch_id">Batch *</label><select id="f_batch_id" name="batch_id" required><option value="">— choose a batch —</option>{% for b in batches %}<option value="{{ b.v }}" {{ 'selected' if (vals.batch_id|string) == (b.v|string) else '' }}>{{ b.l }}</option>{% endfor %}</select>{% if errs.batch_id %}<div class="err" role="alert">{{ errs.batch_id }}</div>{% endif %}</div>
