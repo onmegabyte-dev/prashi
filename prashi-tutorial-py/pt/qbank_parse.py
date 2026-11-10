@@ -130,13 +130,34 @@ def split_questions(lines):
     return [clean('\n'.join(b)) for b in blocks]
 
 
+PAGE_RX = re.compile(r'^\s*(?:page\s+\d+(?:\s*(?:of|/)\s*\d+)?|\d+)\s*$', re.I)
+SECTION_RX = re.compile(r'^\s*(?:section|part|unit)\s+[A-Za-z0-9]+\s*[–—:\-.]', re.I)
+
+
+END_RX = re.compile(r'^\s*(?:quick revision|revision notes|formula sheet|key points|end of (?:the )?(?:paper|set|questions?))\b', re.I)
+
+
+def drop_page_noise(lines):
+    """Removes lines that are not part of any question: "Page 2", headings repeated on every page, and "Section B – …" dividers.
+    Without this they would be glued onto the end of the previous answer."""
+    for i, (t, _) in enumerate(lines):                                 # "Quick Revision" / "End of questions": nothing after it is a question or answer
+        if END_RX.match(t):
+            lines = lines[:i]
+            break
+    seen = {}
+    for t, _ in lines:
+        seen[t.strip()] = seen.get(t.strip(), 0) + 1
+    return [(t, f) for t, f in lines
+            if not PAGE_RX.match(t) and not SECTION_RX.match(t) and not (seen[t.strip()] >= 3 and len(t.strip()) < 80 and not re.match(r'^\s*\(?[A-Da-d][).]', t))]
+
+
 def read_questions(file):
     """file: an UploadedFile. Returns (kind, [question text, ...]); raises ParseError with a plain-English message."""
     kind = kind_of(file.originalname)
     if not kind:
         raise ParseError('Upload a PDF, Word (.docx) or text (.txt) file.')
     lines = {'pdf': _pdf_lines, 'docx': _docx_lines, 'txt': _txt_lines}[kind](file.buffer)
-    qs = [q for q in split_questions(lines) if len(q) >= 5]
+    qs = [q for q in split_questions(drop_page_noise(lines)) if len(q) >= 5]
     if not qs:
         raise ParseError('No questions were found in that file. Number the questions (1. 2. 3. …) or put each one on its own line.')
     if len(qs) > MAX_QUESTIONS:
