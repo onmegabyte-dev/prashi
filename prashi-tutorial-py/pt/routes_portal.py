@@ -2,16 +2,15 @@
 (g.user['id']) - there is no id in any URL that selects a student, so one student can never ask for another's data."""
 import os
 import re
-from pathlib import Path
 
-from flask import Blueprint, abort, g, redirect, request, send_from_directory
+from flask import Blueprint, abort, g, redirect, request
 
 from .audit import audit
 from .db import all_, one, run
 from .mail import send_mail
 from .receipt import load_receipt
 from .tz import now_local
-from .uploads import PRIVATE_DIR, UploadError, read_uploads, remove_private, safe_name, save_image_private
+from .uploads import UploadError, read_uploads, remove_private, safe_name, save_image_private
 from .web import Limiter, body, days_ago, flash, js_round, render, send_private
 from . import content
 
@@ -84,7 +83,7 @@ def dashboard():
     return render('portal/dashboard', {
         'title': 'My dashboard', 'batches': [e for e in f if e['status'] == 'active'], 'totals': totals_of(f), 'att': attendance_summary(sid, 90),
         'scores': with_pct(visible_records(sid, "AND r.type = 'mock_result'")[:5]),
-        'materials': visible_records(sid, "AND r.type IN ('material','notes','test_paper')")[:5], 'notices': my_notices(sid)[:3],
+        'notices': my_notices(sid)[:3],
         'openDoubts': one("SELECT COUNT(*) n FROM doubts WHERE student_id = ? AND status = 'open'", sid)['n'],
         'answered': one("SELECT COUNT(*) n FROM doubts WHERE student_id = ? AND status = 'answered'", sid)['n'],
         'remark': remarks[0] if remarks else None})
@@ -172,16 +171,47 @@ def scores():
     return render('portal/scores', {'title': 'Test scores', 'rows': with_pct(visible_records(g.user['id'], "AND r.type = 'mock_result'"))})
 
 
-@bp.get('/materials')
-def materials():
-    typ = request.args.get('type') if request.args.get('type') in ('material', 'notes', 'test_paper') else ''
-    q = str(request.args.get('q', '')).strip()[:80]
-    rows = visible_records(g.user['id'], "AND r.type IN ('material','notes','test_paper')")
-    if typ:
-        rows = [r for r in rows if r['type'] == typ]
-    if q:
-        rows = [r for r in rows if q.lower() in (r['title'] + ' ' + (r['body'] or '')).lower()]
-    return render('portal/materials', {'title': 'Study material', 'rows': rows, 'type': typ, 'q': q})
+def published(sid):
+    """(class, subject, chapter, question type) rows a teacher published for this student: for their whole class, or for a batch they are in."""
+    b = my_batch_ids(sid)
+    marks = ','.join('?' for _ in b)
+    cl = one('SELECT class_level FROM students WHERE user_id = ?', sid)
+    return all_(f"""SELECT DISTINCT a.class_level, a.subject, a.chapter, a.q_type FROM chapter_access a
+    WHERE (a.batch_id IS NULL AND a.class_level = ?{f' OR a.batch_id IN ({marks})' if b else ''})""", (cl and cl['class_level']) or '', *b)
+
+
+def type_key(t):
+    m = re.match(r'\s*(\d+)', t)
+    return (int(m.group(1)) if m else 99, t.lower())
+
+
+@bp.get('/questions')
+def questions():
+    """Folders, like the teacher sees: Class > Subject > Chapter > Question type (only what was published to this student)."""
+    f = {k: str(request.args.get(k, '')).strip()[:120] for k in ('class_level', 'subject', 'chapter')}
+    rows = published(g.user['id'])
+    if not f['class_level']:
+        f['subject'] = f['chapter'] = ''
+    if not f['subject']:
+        f['chapter'] = ''
+    rows = [r for r in rows if all(not f[k] or r[k].lower() == f[k].lower() for k in f)]
+    ctx = {'title': 'Questions & answers', 'f': f, 'folders': [], 'types': []}
+    if f['chapter']:
+        for typ in sorted({r['q_type'] for r in rows}, key=type_key):
+            ctx['types'].append((typ, all_('SELECT * FROM questions WHERE class_level = ? AND subject = ? AND chapter = ? AND q_type = ? ORDER BY qid',
+                                           f['class_level'], f['subject'], f['chapter'], typ)))
+        ctx['title'] = f['chapter']
+        ctx['level'] = 'types'
+        if not ctx['types']:
+            abort(404)
+    else:
+        level = 'class_level' if not f['class_level'] else 'subject' if not f['subject'] else 'chapter'
+        ctx['level'] = {'class_level': 'class', 'subject': 'subject', 'chapter': 'chapter'}[level]
+        seen = {}
+        for r in rows:
+            seen.setdefault(r[level].lower(), r[level])
+        ctx['folders'] = sorted(seen.values(), key=lambda x: (0, int(x.split()[-1]), '') if re.fullmatch(r'(?i)class\s+\d+', x) else (1, 0, x.lower()))
+    return render('portal/questions', ctx)
 
 
 @bp.get('/remarks')
@@ -192,21 +222,6 @@ def remarks():
 @bp.get('/notices')
 def notices():
     return render('portal/notices', {'title': 'Notices', 'notices': my_notices(g.user['id'])})
-
-
-@bp.get('/files/<fid>')
-def file_(fid):
-    """A file is served only if the record is released AND belongs to this student or one of their batches."""
-    if not re.fullmatch(r'\d+', fid):
-        abort(404)
-    rows = visible_records(g.user['id'], 'AND r.id = ?', int(fid))
-    r = rows[0] if rows else None
-    if not r or not safe_name(r['file_path']):
-        abort(404)
-    name = re.sub(r'[^\w\- ]+', '', r['title']).strip()[:80] or 'file'
-    resp = send_from_directory(PRIVATE_DIR, r['file_path'], as_attachment=True, download_name=name + Path(r['file_path']).suffix)
-    resp.headers['X-Content-Type-Options'] = 'nosniff'
-    return resp
 
 
 # ───── Doubts ─────
